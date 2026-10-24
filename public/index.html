@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B2A4E">
+<title>Pulse Check at Omni Pulse Tech 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+  body { background: var(--navy); color: #fff; transition: background-color .25s; min-height: 100%; }
+  body.good { background: var(--good); }
+  body.bad { background: var(--bad); }
+  body.paper { background: var(--paper); color: var(--navy); }
+  .app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; padding: calc(14px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px)); max-width: 560px; margin: 0 auto; }
+  .top { display: flex; align-items: center; gap: 10px; min-height: 36px; font-size: 15px; }
+  .top .who { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .top .pts { background: rgba(255,255,255,.16); border-radius: 999px; padding: 6px 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .pulse { height: 36px; margin: 8px -20px 0; color: #fff; }
+  body.paper .pulse { color: var(--navy); }
+  .view { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 12px 0; }
+  .view.top-align { justify-content: flex-start; }
+
+  h1 { font-size: 46px; line-height: .92; font-weight: 900; font-stretch: 125%; margin: 0 0 10px; letter-spacing: -.01em; }
+  .msg { font-size: 34px; line-height: 1.05; font-weight: 900; font-stretch: 112%; margin: 0 0 12px; }
+  .note { font-size: 18px; line-height: 1.4; opacity: .88; margin: 0; }
+  .huge { font-size: 64px; font-weight: 900; font-stretch: 125%; line-height: .95; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
+  .err { color: var(--a0); min-height: 1.4em; margin-top: 10px; font-size: 16px; font-weight: 600; }
+  body:not(.paper) .err { color: #FFC9D3; }
+  .primary { width: 100%; font-size: 20px; font-weight: 800; padding: 16px; border: 0; border-radius: 14px; background: var(--pulse); color: #fff; }
+  .primary:disabled { opacity: .6; }
+  .ghost { background: none; border: 2px solid currentColor; border-radius: 999px; padding: 8px 16px; font-weight: 700; font-size: 15px; }
+  .link { background: none; border: 0; padding: 4px 0; text-decoration: underline; font-size: 15px; opacity: .85; }
+
+  /* profile builder */
+  .builder-head { position: sticky; top: 0; z-index: 2; background: var(--paper); display: flex; align-items: center; gap: 16px; padding: 8px 0 14px; margin: 0 -2px; }
+  .builder-head .avatar { box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--navy); }
+  .builder-head h2 { font-size: 26px; font-stretch: 112%; font-weight: 900; margin: 0 0 6px; line-height: 1; }
+  .trait { margin: 14px 0 0; }
+  .trait-label { font-size: 14px; font-weight: 700; margin: 0 0 6px; color: var(--muted); }
+  .options { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; }
+  .options::-webkit-scrollbar { display: none; }
+  .opt-av { border: 0; padding: 0; background: none; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px transparent; }
+  .opt-av[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--navy), 0 0 0 5px var(--pulse); }
+  .field { margin-top: 22px; }
+  .field label, .field .label { display: block; font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+  input[type=text] { width: 100%; font: inherit; font-size: 20px; padding: 14px 16px; border-radius: 14px; border: 2px solid var(--navy); color: var(--navy); background: #fff; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 2px solid var(--navy); background: #fff; color: var(--navy); border-radius: 999px; padding: 9px 14px; font-weight: 700; font-size: 15px; }
+  .chip[aria-pressed="true"] { background: var(--navy); color: #fff; }
+  .savebar { position: sticky; bottom: 0; padding: 14px 0 4px; background: linear-gradient(transparent, var(--paper) 30%); }
+
+  /* game */
+  .me-card { display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,.1); border-radius: 20px; padding: 16px; margin: 18px 0; }
+  .me-card .name { font-size: 24px; font-weight: 900; font-stretch: 112%; }
+  .me-card .tags { font-size: 15px; opacity: .85; margin-top: 4px; }
+  .qtext { font-size: 20px; line-height: 1.3; font-weight: 700; margin: 0 0 16px; }
+  .qmeta { display: flex; justify-content: space-between; font-size: 14px; opacity: .8; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .ready { font-size: 96px; font-weight: 900; font-stretch: 125%; line-height: 1; margin: 18px 0 6px; font-variant-numeric: tabular-nums; color: var(--pulse); }
+  .opts { display: grid; gap: 10px; flex: 1; grid-auto-rows: 1fr; max-height: 62vh; }
+  .opts.two { grid-template-columns: 1fr 1fr; }
+  .opt { display: flex; align-items: center; gap: 14px; border: 0; border-radius: 16px; background: var(--c); color: var(--on); padding: 14px 16px; font-size: 18px; font-weight: 700; text-align: left; line-height: 1.2; min-height: 64px; }
+  .opts.two .opt { flex-direction: column; justify-content: center; text-align: center; font-size: 22px; }
+  .opt .shape { font-size: 26px; }
+  .opt:active { transform: scale(.98); }
+  .picked { display: inline-flex; align-items: center; gap: 10px; background: var(--c); color: var(--on); border-radius: 12px; padding: 10px 14px; font-weight: 700; margin-top: 16px; align-self: flex-start; }
+  .picked .shape { font-size: 22px; }
+  .rank { margin-top: 24px; font-size: 20px; }
+  .rank b { font-size: 28px; }
+  .streak { display: inline-block; margin-top: 12px; background: rgba(255,255,255,.2); border-radius: 999px; padding: 6px 14px; font-weight: 700; align-self: flex-start; }
+  .match { text-align: center; align-items: center; }
+  .match .avatar { margin: 16px auto 12px; box-shadow: 0 0 0 5px #fff; }
+  .match .name { font-size: 38px; font-weight: 900; font-stretch: 112%; line-height: 1; }
+  .match .tags { font-size: 18px; margin-top: 8px; opacity: .9; }
+  .banner { position: fixed; top: 0; left: 0; right: 0; background: var(--a2); color: var(--navy-deep); text-align: center; padding: calc(8px + env(safe-area-inset-top, 0px)) 8px 8px; font-weight: 700; display: none; z-index: 5; }
+</style>
+</head>
+<body>
+<div class="banner" id="banner">Reconnecting… your score is safe.</div>
+<div class="app">
+  <div class="top" id="top"></div>
+  <div class="pulse" id="pulse"></div>
+  <main class="view" id="view"><p class="note">Loading…</p></main>
+</div>
+
+<script src="/avatar.js"></script>
+<script src="/common.js"></script>
+<script>
+const $view = document.getElementById('view');
+const $top = document.getElementById('top');
+const $pulse = document.getElementById('pulse');
+$pulse.innerHTML = ecgSvg();
+
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+let token = store.get('pc_token');
+let me = null;          // from /api/me
+let st = null;          // public game state
+let mode = token ? 'game' : 'profile';
+let notice = '';
+let draft = null;       // profile being edited
+let local = { idx: -1, choice: null, status: '' };
+let lastKey = '';
+const timers = new Set();
+const clearTimers = () => { timers.forEach(f => f()); timers.clear(); };
+
+// ---------- data ----------
+let meBusy = false, meWanted = false;
+async function loadMe(jitter = 0) {
+  if (!token) return;
+  if (meBusy) { meWanted = true; return; }
+  meBusy = true;
+  if (jitter) await sleep(Math.random() * jitter);
+  try {
+    me = await api('me', { headers: { 'x-player-token': token } });
+    if (me.answer && me.answer.choice !== null && me.answer.choice !== undefined && local.idx !== me.answer.idx) {
+      local = { idx: me.answer.idx, choice: me.answer.choice, status: 'locked' };
+    }
+  } catch (e) {
+    if (e.status === 401) {
+      token = null; me = null; store.del('pc_token');
+      notice = 'Your profile was removed or reset. Make a new one to keep playing.';
+      mode = 'profile'; draft = null;
+    }
+  } finally {
+    meBusy = false;
+    render();
+    if (meWanted) { meWanted = false; loadMe(); }
+  }
+}
+
+function onState(s) {
+  const prev = st;
+  st = s;
+  if (token && mode === 'game') {
+    const changed = !prev || prev.v !== s.v || prev.id !== s.id;
+    const newGame = me && s.id && me.game !== s.id;
+    if (newGame) loadMe(300);
+    else if (changed && s.phase !== 'question') loadMe(s.phase === 'lobby' ? 300 : 900);
+    else if (changed && (!me || (!prev && me.idx !== s.idx))) loadMe();
+  }
+  render();
+}
+
+// ---------- header ----------
+function header() {
+  if (mode !== 'game' || !me) { $top.innerHTML = ''; return; }
+  const p = me.profile;
+  $top.innerHTML = `${avatarSvg(p.avatar, { size: 34 })}<span class="who">${esc(p.nickname)}</span>
+    <span class="pts">${(me.score || 0).toLocaleString()} pts</span>`;
+}
+
+// ---------- render ----------
+function setMood(m) { document.body.className = m || ''; }
+
+function render(force) {
+  header();
+  if (mode === 'profile') {
+    if (lastKey !== 'profile' || force) { lastKey = 'profile'; clearTimers(); ecgIdle($pulse); profileView(); }
+    return;
+  }
+  if (!me || !st) { setMood(); $view.innerHTML = '<p class="note">Joining the game…</p>'; lastKey = ''; return; }
+  const a = me.answer && me.answer.idx === st.idx ? me.answer : null;
+  const key = [st.phase, st.id, st.idx, st.v, local.idx === st.idx ? local.status + local.choice : '', me.v, me.rank, me.score, st.phase === 'lobby' ? st.players : '', a ? a.points : ''].join('|');
+  if (key === lastKey && !force) return;
+  lastKey = key;
+  clearTimers();
+  ecgIdle($pulse);
+  $view.className = 'view';
+
+  if (st.phase === 'none') { setMood(); $view.innerHTML = `<p class="msg">Almost time.</p><p class="note">The host hasn’t opened a game yet. Keep this page open.</p>`; return; }
+  const s = st.slide;
+  switch (st.phase) {
+    case 'lobby': return lobbyView();
+    case 'slide': return s.type === 'match' ? matchView(s) : slideView(s);
+    case 'question': return questionView(s);
+    case 'reveal': return resultView(s);
+    case 'leaderboard': setMood(); return rankView('Leaderboard');
+    case 'final': return finalView();
+  }
+}
+
+function tagsFor(p) {
+  return [ROLE_LABELS[p.role], INTEREST_LABELS[p.interest] ? 'into ' + INTEREST_LABELS[p.interest] : ''].filter(Boolean).join(', ');
+}
+
+function lobbyView() {
+  setMood();
+  const p = me.profile;
+  $view.innerHTML = `<p class="msg">You’re in.</p>
+    <p class="note">Watch the big screen. The game starts soon.</p>
+    <div class="me-card">${avatarSvg(p.avatar, { size: 72 })}<div><div class="name">${esc(p.nickname)}</div><div class="tags">${esc(tagsFor(p))}</div></div></div>
+    <p class="note"><b>${st.players}</b> ${st.players === 1 ? 'player' : 'players'} joined</p>
+    <p style="margin-top:22px"><button class="ghost" id="edit">Edit profile</button></p>`;
+  document.getElementById('edit').onclick = () => { draft = null; mode = 'profile'; render(true); };
+}
+
+function slideView(s) {
+  setMood();
+  $view.innerHTML = s.type === 'talk'
+    ? `<p class="msg">${esc(s.title)}</p><p class="note">${esc(s.text)}</p>`
+    : `<p class="note">${esc(s.subtitle)}</p><p class="msg" style="margin-top:8px">${esc(s.title)}</p>${s.blurb ? `<p class="note">${esc(s.blurb)}</p>` : ''}`;
+}
+
+function matchView(s) {
+  setMood();
+  const m = me.match;
+  $view.className = 'view match';
+  if (!m) { $view.innerHTML = `<p class="msg">${esc(s.title)}</p><p class="note">Find someone you haven’t met and say hi.</p>`; return; }
+  $view.innerHTML = `<p class="note">Find this person:</p>
+    ${avatarSvg(m.avatar, { size: 150, label: m.nickname })}
+    <div class="name">${esc(m.nickname)}</div>
+    <div class="tags">${esc([m.roleLabel, m.interestLabel ? 'into ' + m.interestLabel : ''].filter(Boolean).join(', '))}</div>
+    <p class="note" style="margin-top:18px">${m.sameInterest ? 'You’re both into ' + esc(m.interestLabel) + '. Start there.' : 'Ask what they’re working on.'} Hold up your phone so they can find you too.</p>`;
+}
+
+function questionView(s) {
+  setMood();
+  const mine = local.idx === st.idx ? local : null;
+  if (mine && mine.status) {
+    const i = mine.choice;
+    if (mine.status === 'late') { $view.innerHTML = `<p class="msg">Time’s up.</p><p class="note">That answer didn’t make it in. Get ready for the next one.</p>`; return; }
+    $view.innerHTML = `<p class="msg">${mine.status === 'sending' ? 'Sending…' : 'Locked in.'}</p><p class="note">Waiting for the timer…</p>
+      <span class="picked c${i}">${SHAPES[i]}${esc(s.options[i])}</span>`;
+    return;
+  }
+  if (Clock.now() < st.openAt) {
+    $view.innerHTML = `<div class="qmeta"><span>Question ${s.num} of ${s.total}${s.double ? ', double points' : ''}</span></div>
+      <p class="qtext">${esc(s.text)}</p><p class="note">Answers open in</p><div class="ready" id="ready"></div>`;
+    const el = document.getElementById('ready');
+    timers.add(ecgCountdown($pulse, st.openAt, 3500, sec => { el.textContent = sec; }));
+    timers.add(atServerTime(st.openAt, () => render(true)));
+    return;
+  }
+  if (Clock.now() > st.endsAt + 800) { $view.innerHTML = `<p class="msg">Time’s up.</p><p class="note">Results coming…</p>`; return; }
+  const two = s.options.length === 2;
+  $view.innerHTML = `<div class="qmeta"><span>Question ${s.num} of ${s.total}${s.double ? ', double points' : ''}</span><span id="secs"></span></div>
+    <p class="qtext">${esc(s.text)}</p>
+    <div class="opts ${two ? 'two' : ''}">${s.options.map((o, i) => `<button class="opt c${i}" data-i="${i}">${SHAPES[i]}<span>${esc(o)}</span></button>`).join('')}</div>`;
+  $view.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => answer(Number(b.dataset.i))));
+  const secs = document.getElementById('secs');
+  timers.add(ecgCountdown($pulse, st.endsAt, s.time * 1000, sec => { secs.textContent = sec + 's'; }));
+  timers.add(atServerTime(st.endsAt + 900, () => render(true)));
+}
+
+async function answer(i) {
+  if (!st || st.phase !== 'question' || local.idx === st.idx) return;
+  const idx = st.idx;
+  local = { idx, choice: i, status: 'sending' };
+  if (navigator.vibrate) navigator.vibrate(25);
+  render(true);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await api('answer', { method: 'POST', body: { idx, choice: i }, headers: { 'x-player-token': token } });
+      if (local.idx === idx) { local.status = 'locked'; render(true); }
+      return;
+    } catch (e) {
+      if (e.status === 409 || e.status === 400) { if (local.idx === idx) { local.status = 'late'; render(true); } return; }
+      if (e.status === 401) return loadMe();
+      await sleep(400);
+    }
+  }
+  if (local.idx === idx) { local.status = 'late'; render(true); }
+}
+
+function resultView(s) {
+  const a = me.answer && me.answer.idx === st.idx ? me.answer : null;
+  if (!a || (a.choice !== null && a.correct === null)) { setMood(); $view.innerHTML = '<p class="note">Checking answers…</p>'; if (me.v < st.v) loadMe(600); return; }
+  const r = st.reveal;
+  const right = `<span class="picked c${r.answer}">${SHAPES[r.answer]}${esc(s.options[r.answer])}</span>`;
+  if (a.choice === null) {
+    setMood('bad');
+    $view.innerHTML = `<p class="msg">No answer this time.</p><p class="note">The answer was</p>${right}${rankLine()}`;
+  } else if (a.correct) {
+    setMood('good');
+    $view.innerHTML = `<p class="msg">Correct.</p><p class="huge">+${a.points.toLocaleString()}</p>
+      ${me.streak > 1 ? `<span class="streak">${me.streak} in a row</span>` : ''}${rankLine()}`;
+  } else {
+    setMood('bad');
+    $view.innerHTML = `<p class="msg">Not this time.</p><p class="note">The answer was</p>${right}${rankLine()}`;
+  }
+}
+
+function rankLine() { return me.rank ? `<p class="rank">You’re <b>${ordinal(me.rank)}</b> of ${me.of}</p>` : ''; }
+
+function rankView(title) {
+  $view.innerHTML = `<p class="note">${esc(title)}</p><p class="huge">${me.rank ? ordinal(me.rank) : '–'}</p>
+    <p class="note">of ${me.of} players, with ${(me.score || 0).toLocaleString()} points and ${me.correct || 0} right.</p>`;
+}
+
+function finalView() {
+  if (me.rank && me.rank <= 2) {
+    setMood('good');
+    $view.innerHTML = `<p class="msg">You won ${me.rank === 1 ? '1st' : '2nd'} place.</p><p class="huge">${me.score.toLocaleString()}</p>
+      <p class="note">Head to the stage to claim your prize. Show this screen.</p>`;
+  } else {
+    setMood();
+    rankView('Final result');
+    $view.insertAdjacentHTML('beforeend', '<p class="note" style="margin-top:20px">Thanks for playing. Now go meet the employers in the Industry Marketplace.</p>');
+  }
+}
+
+// ---------- profile builder ----------
+const TRAITS = [
+  ['skin', 'Skin'], ['hair', 'Hair'], ['hairColor', 'Hair colour'], ['eyes', 'Eyes'], ['mouth', 'Mouth'],
+  ['facial', 'Facial hair'], ['acc', 'Extras'], ['shirt', 'Top'], ['bg', 'Background']
+];
+
+function profileView() {
+  setMood('paper');
+  const isNew = !token;
+  if (!draft) {
+    const p = me && me.profile;
+    draft = p ? { nickname: p.nickname, role: p.role, interest: p.interest, avatar: { ...p.avatar } }
+              : { nickname: '', role: '', interest: '', avatar: randomAvatar() };
+  }
+  $view.className = 'view top-align';
+  $view.innerHTML = `
+    ${isNew ? `<h1>Pulse<br>Check</h1><p class="note" style="margin-bottom:10px">The live quiz at Omni Pulse Tech 2026. Make your player, then watch the big screen.</p>` : ''}
+    ${notice ? `<p class="err">${esc(notice)}</p>` : ''}
+    <div class="builder-head">
+      <div id="preview"></div>
+      <div><h2>${isNew ? 'Your player' : 'Edit profile'}</h2><button class="ghost" id="shuffle" type="button">Randomize</button></div>
+    </div>
+    <div id="traits"></div>
+    <div class="field"><label for="nick">Nickname</label>
+      <input type="text" id="nick" maxlength="18" autocomplete="nickname" autocapitalize="words" placeholder="e.g. Priya from Humber" value="${esc(draft.nickname)}">
+    </div>
+    <div class="field"><span class="label" id="roleL">I’m a</span><div class="chips" role="group" aria-labelledby="roleL" id="roles"></div></div>
+    <div class="field"><span class="label" id="intL">I’m into</span><div class="chips" role="group" aria-labelledby="intL" id="ints"></div></div>
+    <p class="note" style="font-size:14px;margin-top:16px;color:var(--muted)">Your nickname and avatar appear on the big screen. Your interest is used to match you with another player during the game.</p>
+    <div class="savebar">
+      <button class="primary" id="save">${isNew ? 'Join the game' : 'Save changes'}</button>
+      <div class="err" id="perr"></div>
+      ${!isNew ? '<button class="link" id="cancel" style="color:var(--navy)">Back to the game</button>' : ''}
+    </div>`;
+  paintPreview();
+  paintTraits();
+  paintChips('roles', ROLE_LABELS, 'role');
+  paintChips('ints', INTEREST_LABELS, 'interest');
+  document.getElementById('nick').addEventListener('input', e => { draft.nickname = e.target.value; });
+  document.getElementById('shuffle').onclick = () => { draft.avatar = randomAvatar(); paintPreview(); paintTraits(); };
+  document.getElementById('save').onclick = saveProfile;
+  const cancel = document.getElementById('cancel');
+  if (cancel) cancel.onclick = () => { draft = null; notice = ''; mode = 'game'; render(true); };
+}
+
+function paintPreview() {
+  document.getElementById('preview').innerHTML = avatarSvg(draft.avatar, { size: 104, label: 'Your avatar' });
+}
+
+function paintTraits() {
+  const box = document.getElementById('traits');
+  const keep = {};
+  box.querySelectorAll('.options').forEach(o => { keep[o.dataset.trait] = o.scrollLeft; });
+  box.innerHTML = TRAITS.map(([k, label]) => {
+    const n = AVATAR_PARTS[k];
+    let btns = '';
+    for (let v = 0; v < n; v++) {
+      const cfg = { ...draft.avatar, [k]: v };
+      const name = typeof AV[k][v] === 'string' && !AV[k][v].startsWith('#') ? AV[k][v] : `${label} ${v + 1}`;
+      btns += `<button class="opt-av" type="button" data-k="${k}" data-v="${v}" aria-pressed="${draft.avatar[k] === v}" aria-label="${esc(name)}">${avatarSvg(cfg, { size: 52 })}</button>`;
+    }
+    return `<div class="trait"><p class="trait-label">${label}</p><div class="options" data-trait="${k}">${btns}</div></div>`;
+  }).join('');
+  box.querySelectorAll('.options').forEach(o => { if (keep[o.dataset.trait]) o.scrollLeft = keep[o.dataset.trait]; });
+  box.onclick = e => {
+    const b = e.target.closest('.opt-av');
+    if (!b) return;
+    draft.avatar[b.dataset.k] = Number(b.dataset.v);
+    paintPreview();
+    paintTraits();
+  };
+}
+
+function paintChips(id, labels, field) {
+  const el = document.getElementById(id);
+  el.innerHTML = Object.entries(labels).map(([k, l]) => `<button class="chip" type="button" data-k="${k}" aria-pressed="${draft[field] === k}">${esc(l)}</button>`).join('');
+  el.onclick = e => {
+    const b = e.target.closest('.chip');
+    if (!b) return;
+    draft[field] = draft[field] === b.dataset.k ? '' : b.dataset.k;
+    paintChips(id, labels, field);
+  };
+}
+
+async function saveProfile() {
+  const btn = document.getElementById('save');
+  const err = document.getElementById('perr');
+  err.textContent = '';
+  if (draft.nickname.trim().length < 2) { err.textContent = 'Pick a nickname of 2 to 18 characters.'; return; }
+  btn.disabled = true;
+  try {
+    const res = await api('profile', { method: 'POST', body: draft, headers: token ? { 'x-player-token': token } : {} });
+    if (res.token) { token = res.token; store.set('pc_token', token); }
+    notice = ''; draft = null; mode = 'game';
+    await loadMe();
+    render(true);
+  } catch (e) {
+    err.textContent = e.message;
+    btn.disabled = false;
+  }
+}
+
+// ---------- boot ----------
+(async () => {
+  render(true);
+  await Clock.sync();
+  if (token) loadMe();
+  setInterval(() => Clock.sync(), 60000);
+  startPolling(() => api('state'), onState, {
+    interval: 1000,
+    onError: (e, n) => { document.getElementById('banner').style.display = e && n > 2 ? 'block' : 'none'; }
+  });
+})();
+</script>
+</body>
+</html>

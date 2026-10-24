@@ -1,0 +1,38 @@
+:root {
+  --navy: #1B2A4E;
+  --navy-deep: #13203F;
+  --paper: #EEF2F7;
+  --line: #C9D2E0;
+  --muted: #5B6785;
+  --pulse: #FF4D6D;
+  --a0: #E23D4B;
+  --a1: #2F6FDE;
+  --a2: #F2A900;
+  --a3: #1E9E6A;
+  --good: #1E9E6A;
+  --bad: #E23D4B;
+  --font: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: var(--font); color: var(--navy); background: var(--paper); -webkit-font-smoothing: antialiased; }
+button { font: inherit; cursor: pointer; color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--pulse); outline-offset: 3px; }
+
+.c0 { --c: var(--a0); --on: #fff; }
+.c1 { --c: var(--a1); --on: #fff; }
+.c2 { --c: var(--a2); --on: var(--navy-deep); }
+.c3 { --c: var(--a3); --on: #fff; }
+.shape { width: 1em; height: 1em; flex: none; fill: currentColor; }
+.avatar { display: block; flex: none; border-radius: 50%; }
+
+.ecg { display: block; width: 100%; height: 100%; overflow: visible; }
+.ecg path { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.ecg .base { stroke: currentColor; opacity: .14; }
+.ecg .live { stroke: var(--pulse); stroke-dasharray: 1000 1000; opacity: 0; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0s !important; animation: none !important; }
+}
