@@ -29,6 +29,17 @@
   .cat .n { font-size: 15px; color: var(--muted); margin-top: 6px; }
   .cat[aria-pressed="true"] .n::before { content: "✓ In the game · "; color: var(--a3); font-weight: 700; }
   .opts-row { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; margin: 28px 0; font-size: 20px; }
+  .ctl { display: inline-flex; align-items: center; gap: 10px; }
+  .ctl small { font-size: 15px; color: var(--muted); }
+  .step { display: inline-flex; align-items: center; border: 2px solid var(--navy); border-radius: 999px; overflow: hidden; }
+  .step button { background: #fff; border: 0; width: 42px; padding: 8px 0; font-size: 22px; font-weight: 800; line-height: 1; color: var(--navy); }
+  .step button:hover:not(:disabled) { background: var(--navy); color: #fff; }
+  .step button:disabled { opacity: .3; cursor: default; }
+  .step input { width: 62px; border: 0; border-left: 2px solid var(--navy); border-right: 2px solid var(--navy);
+    text-align: center; font: inherit; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums;
+    color: var(--navy); background: #fff; padding: 8px 0; -moz-appearance: textfield; }
+  .step input::-webkit-outer-spin-button, .step input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .step input:focus { outline: 3px solid var(--pulse); outline-offset: -3px; }
   .seg { display: inline-flex; border: 2px solid var(--navy); border-radius: 999px; overflow: hidden; margin-left: 10px; }
   .seg button { background: #fff; border: 0; padding: 8px 16px; font-weight: 700; }
   .seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
@@ -39,12 +50,12 @@
   .summary { font-size: 18px; color: var(--muted); margin-left: 16px; }
 
   /* lobby */
-  .lobby { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 48px; }
-  .join { display: flex; flex-direction: column; justify-content: center; }
-  .title { font-size: clamp(56px, 7vw, 128px); line-height: .88; font-weight: 900; font-stretch: 125%; margin: 0 0 18px; letter-spacing: -.02em; }
-  .lede2 { font-size: 26px; line-height: 1.3; margin: 0 0 18px; max-width: 24ch; }
+  .lobby { height: 100%; display: grid; grid-template-columns: minmax(340px, 1fr) minmax(0, 1.2fr); gap: 48px; min-height: 0; }
+  .join { display: flex; flex-direction: column; justify-content: center; min-height: 0; min-width: 0; }
+  .title { font-size: clamp(44px, 5.6vw, 104px); line-height: .9; font-weight: 900; font-stretch: 125%; margin: 0 0 14px; letter-spacing: -.02em; }
+  .lede2 { font-size: clamp(18px, 1.5vw, 24px); line-height: 1.3; margin: 0 0 16px; max-width: 24ch; }
   .qr { background: #fff; padding: 16px; border-radius: 24px; box-shadow: 0 0 0 3px var(--navy); align-self: flex-start; }
-  .qr img { display: block; width: min(34vh, 24vw); height: auto; }
+  .qr img { display: block; width: clamp(150px, min(30vh, 22vw), 320px); height: auto; }
   .url { font-size: 22px; font-weight: 700; color: var(--a1); margin-top: 14px; word-break: break-all; }
   .wall { display: flex; flex-direction: column; min-height: 0; }
   .count { font-size: 24px; margin: 6px 0 14px; }
@@ -60,7 +71,7 @@
   /* cards */
   .card { height: 100%; display: flex; flex-direction: column; justify-content: center; }
   .card .sub { font-size: 30px; color: var(--muted); margin: 0 0 12px; }
-  .card .art { color: var(--navy); margin: 0 0 18px; align-self: flex-start; }
+  .card .art { color: var(--navy); margin: 0 0 20px; align-self: flex-start; width: clamp(220px, 27vw, 470px); height: auto; }
   .card.brk .art { color: var(--pulse); }
   .card h1 { font-size: clamp(64px, 9vw, 170px); line-height: .9; font-weight: 900; font-stretch: 125%; margin: 0 0 22px; letter-spacing: -.02em; max-width: 14ch; }
   .card p { font-size: 34px; margin: 0; color: var(--muted); max-width: 32ch; line-height: 1.3; }
@@ -70,9 +81,13 @@
   /* question */
   .q { height: 100%; display: grid; grid-template-rows: auto auto 1fr; gap: 22px; }
   .q.reading { grid-template-rows: auto 1fr; }
-  .q-meta { display: flex; gap: 16px; align-items: center; font-size: 22px; color: var(--muted); }
-  .q-meta .art { color: var(--navy); flex: none; align-self: center; }
-  .q-meta .ct { font-weight: 700; color: var(--navy); }
+  .q-meta { display: flex; gap: 22px; align-items: center; font-size: 22px; color: var(--muted); }
+  .q-meta .art { color: var(--navy); flex: none; align-self: center; width: clamp(96px, 10vw, 180px); height: auto; }
+  /* The baseline belongs under the big round-card art; beside a line of text it
+     just reads as a stray rule. */
+  .q-meta .art .base-ln { display: none; }
+  .q-meta .ct { font-weight: 800; color: var(--navy); font-size: clamp(24px, 2.1vw, 40px); font-stretch: 112%; }
+  .reading .q-meta .art { width: clamp(120px, 13vw, 240px); }
   .dbl { background: var(--pulse); color: #fff; font-weight: 800; padding: 4px 14px; border-radius: 999px; }
   .q-head { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: start; }
   .q-text { font-size: clamp(36px, 3.5vw, 64px); line-height: 1.12; font-weight: 800; margin: 0; max-width: 32ch; }
@@ -85,15 +100,31 @@
   .ans { font-size: 20px; color: var(--muted); margin-top: 6px; }
   .ans b { color: var(--navy); font-size: 28px; font-variant-numeric: tabular-nums; }
   .fact { font-size: 26px; line-height: 1.35; max-width: 62ch; margin: 0; padding-left: 20px; border-left: 6px solid var(--pulse); }
-  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; min-height: 0; }
-  .tile { position: relative; overflow: hidden; display: flex; align-items: center; gap: 22px; padding: 20px 28px; border-radius: 18px; background: var(--c); color: var(--on); font-size: clamp(24px, 2.3vw, 40px); font-weight: 700; line-height: 1.15; min-height: 0; }
-  .tile .shape { font-size: 1.3em; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; min-height: 0; }
+  .tile { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 14px 22px; border-radius: 18px; background: var(--c); color: var(--on); font-size: clamp(17px, 1.75vw, 32px); font-weight: 700; line-height: 1.14; min-height: 0; }
+  /* The option text has to be allowed to shrink, or a long answer pushes the
+     count out of the tile and the two overlap. */
+  .tile > span:not(.n) { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+  .tile .shape { font-size: 1.25em; flex: none; }
   .tile .fill { position: absolute; left: 0; bottom: 0; height: 10px; background: currentColor; opacity: .5; width: 0; transition: width .8s ease-out; }
-  .tile .n { margin-left: auto; font-size: 1.2em; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .tile .n { flex: none; margin-left: auto; font-size: 1.15em; font-weight: 900; font-variant-numeric: tabular-nums; }
   .tiles.reveal .tile.wrong { background: #fff; color: #9AA4BC; box-shadow: inset 0 0 0 3px var(--line); }
   .tiles.reveal .tile.right { box-shadow: 0 0 0 6px var(--navy); animation: tile-pop .52s cubic-bezier(.3,.9,.3,1) .1s 2; }
   @keyframes tile-pop { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.035); } }
   .tiles.reveal .tile.right .n::before { content: "✓ "; }
+
+  /* watermark: the same artwork, large and faint, as a ground for busier screens */
+  /* `position` stays on .watermark itself and the lift rule skips it, otherwise
+     `.board > *` would win on equal specificity and drop it back into the flow. */
+  .watermark { position: absolute; pointer-events: none; opacity: .06; color: var(--navy); z-index: 0; }
+  .watermark .art { width: 100%; height: auto; }
+  /* Not on the lobby: that screen is already full, and clipping it to hold a
+     watermark cut off the join QR. */
+  .board, .card.brk { position: relative; overflow: hidden; }
+  .board > *:not(.watermark),
+  .card.brk > *:not(.watermark) { position: relative; z-index: 1; }
+  .board .watermark { right: -3%; bottom: 0; width: 44%; }
+  .card.brk .watermark { right: 2%; top: 50%; transform: translateY(-50%); width: 36%; color: var(--pulse); opacity: .09; }
 
   /* boards */
   .board { height: 100%; display: flex; flex-direction: column; justify-content: center; max-width: 1100px; }
@@ -101,23 +132,37 @@
   .row { display: grid; grid-template-columns: 64px 64px 1fr auto; align-items: center; gap: 20px; padding: 12px 0; border-bottom: 2px solid var(--line); font-size: 36px; font-weight: 700; }
   .row .r { color: var(--muted); font-stretch: 125%; font-variant-numeric: tabular-nums; }
   .row .s { font-variant-numeric: tabular-nums; }
-  /* final: three places, tallest in the middle, networking panel alongside */
-  .final { height: 100%; display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(300px, .9fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 18px 40px; }
-  .final h2 { grid-column: 1 / -1; font-size: clamp(36px, 3.4vw, 56px); font-weight: 900; font-stretch: 125%; margin: 0; line-height: 1.02; }
+  /* final: three places, tallest in the middle, networking panel alongside.
+     Every child is placed explicitly. .netcard has a definite row, and the grid
+     spec places row-locked items before auto-positioned ones, so leaving the
+     podium on auto handed column 1 to the netcard and pushed the podium right. */
+  .final { height: 100%; display: grid; grid-template-columns: minmax(0, 2fr) minmax(290px, .85fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 14px 36px; }
+  .final h2 { grid-column: 1 / -1; grid-row: 1; font-size: clamp(28px, 2.7vw, 46px); font-weight: 900; font-stretch: 125%; margin: 0; line-height: 1.05; }
+  .final .podium { grid-column: 1; grid-row: 2; }
+  .final .netcard { grid-column: 2; grid-row: 2 / 4; }
+  .final .runners { grid-column: 1; grid-row: 3; }
   .final.no-net { grid-template-columns: minmax(0, 1fr); }
-  .podium { display: grid; grid-template-columns: 1fr 1.25fr 1fr; align-items: end; gap: 18px; min-height: 0; }
-  .win { border-radius: 24px 24px 0 0; padding: 22px 20px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; position: relative; }
-  .win .avatar { width: min(15vh, 132px); height: auto; margin-bottom: 10px; box-shadow: 0 0 0 5px #fff, 0 0 0 7px rgba(27,42,78,.18); }
-  .win .medal { position: absolute; top: -16px; right: 14px; color: var(--pulse); }
-  .win.p1 { background: var(--navy); color: #fff; padding-top: 34px; padding-bottom: 38px; }
-  .win.p1 .medal { color: var(--a2); }
+  /* Podium: a flex row so one, two or three winners all sit correctly, and the
+     medal is in the flow rather than absolutely placed, so it can never clip. */
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 18px; min-height: 0; }
+  .win { flex: 1 1 0; max-width: 330px; min-width: 0; max-height: 100%; border-radius: 20px 20px 0 0; padding: 16px 16px 18px;
+         display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; }
+  .win .medal { width: clamp(30px, 5.4vh, 50px); height: auto; margin-bottom: 6px; color: var(--pulse); flex: none; }
+  .win .avatar { width: clamp(52px, 10vh, 104px); height: auto; margin-bottom: 10px; flex: none; box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(27,42,78,.16); }
+  .win .place { font-size: clamp(11px, 1.4vh, 15px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pulse); }
+  .win .name { font-size: clamp(17px, 1.8vw, 32px); line-height: 1.05; font-weight: 900; font-stretch: 112%; margin: 4px 0 2px; overflow-wrap: anywhere; }
+  .win .pts { font-size: clamp(13px, 1.6vh, 18px); opacity: .75; font-variant-numeric: tabular-nums; }
+
+  /* First place is taller, darker and wider. */
+  .win.p1 { background: var(--navy); color: #fff; flex-grow: 1.28; padding-top: 22px; padding-bottom: 30px; }
+  .win.p1 .medal { width: clamp(38px, 6.6vh, 62px); color: var(--a2); }
+  .win.p1 .avatar { width: clamp(62px, 12.4vh, 126px); }
+  .win.p1 .place { color: var(--a2); }
+  .win.p1 .name { font-size: clamp(20px, 2.2vw, 38px); }
   .win.p2 { background: #fff; box-shadow: inset 0 0 0 3px var(--navy); }
   .win.p3 { background: #fff; box-shadow: inset 0 0 0 3px var(--line); }
-  .win .place { font-size: 17px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--pulse); }
-  .win.p1 .place { color: var(--a2); }
-  .win .name { font-size: clamp(22px, 2.3vw, 42px); line-height: 1.02; font-weight: 900; font-stretch: 112%; margin: 4px 0 2px; overflow-wrap: anywhere; }
-  .win .pts { font-size: 19px; opacity: .75; font-variant-numeric: tabular-nums; }
-  .runners { grid-column: 1; display: flex; flex-wrap: wrap; gap: 10px 26px; font-size: 20px; color: var(--muted); align-items: center; }
+  .win.p3 .medal { color: var(--muted); }
+  .runners { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: clamp(14px, 1.9vh, 20px); color: var(--muted); align-items: center; }
   .runners span { display: inline-flex; gap: 9px; align-items: center; }
   .runners b { color: var(--navy); font-variant-numeric: tabular-nums; }
 
@@ -134,22 +179,29 @@
   .netfull .qr img { width: min(62vh, 38vw); }
 
   /* winners list (menu panel) */
-  .wins { position: fixed; right: 32px; bottom: 98px; width: min(460px, 92vw); max-height: 66vh; overflow: auto; background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 16px; display: none; flex-direction: column; gap: 10px; z-index: 6; }
+  /* Only the list scrolls, so the title, the buttons and the endpoint stay put
+     however long the list gets. */
+  .wins { position: fixed; right: 32px; bottom: 98px; width: min(460px, 92vw); max-height: min(70vh, 640px); background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 16px; display: none; flex-direction: column; gap: 10px; z-index: 6; box-shadow: 0 18px 48px rgba(19, 32, 63, .28); }
   .wins.open { display: flex; }
   .wins h3 { font-size: 20px; font-weight: 900; margin: 0; }
   .wins .sub { font-size: 14px; color: var(--muted); margin: -4px 0 2px; line-height: 1.4; }
-  .wins ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .wins .scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -4px; padding: 0 4px; }
+  .wins ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+  .wins .gsep { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 12px 0 3px; }
+  .wins .gsep::after { content: ""; flex: 1; height: 2px; background: var(--line); border-radius: 2px; }
+  .wins .gsep:first-child { margin-top: 0; }
   .wins li { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; padding: 5px 8px; border-radius: 10px; background: var(--paper); }
   .wins li .pl { font-size: 13px; font-weight: 800; color: var(--pulse); width: 26px; flex: none; font-variant-numeric: tabular-nums; }
   .wins li .nm2 { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .wins li .sc { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .wins .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .wins li .sc { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+  .wins .acts { display: flex; gap: 8px; flex-wrap: wrap; flex: none; }
   .wins .acts button { flex: 1; min-width: 120px; background: var(--navy); color: #fff; border: 0; border-radius: 10px; padding: 10px 12px; font-size: 15px; font-weight: 700; }
+  .wins .acts button:disabled { opacity: .45; cursor: default; }
   .wins .acts button.warn { background: #fff; color: var(--a0); box-shadow: inset 0 0 0 2px var(--a0); }
-  .wins .ep { font-size: 13px; color: var(--muted); word-break: break-all; }
+  .wins .ep { font-size: 12px; color: var(--muted); word-break: break-all; flex: none; margin: 0; line-height: 1.45; }
 
   /* mentor links editor */
-  .ment { position: fixed; right: 32px; bottom: 98px; width: min(620px, 94vw); max-height: 72vh; overflow: auto; background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 16px; display: none; flex-direction: column; gap: 10px; z-index: 6; }
+  .ment { position: fixed; right: 32px; bottom: 98px; width: min(620px, 94vw); max-height: 72vh; overflow: auto; overscroll-behavior: contain; background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 16px; display: none; flex-direction: column; gap: 10px; z-index: 6; }
   .ment.open { display: flex; }
   .ment h3 { font-size: 20px; font-weight: 900; margin: 0; }
   .ment .sub { font-size: 14px; color: var(--muted); margin: -4px 0 0; line-height: 1.45; }
@@ -167,6 +219,14 @@
   .next:disabled { opacity: .5; cursor: default; }
   .gear { background: #fff; border: 2px solid var(--navy); color: var(--navy); border-radius: 999px; padding: 14px 20px; font-size: 18px; font-weight: 700; }
   .menu { position: fixed; right: 32px; bottom: 98px; background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 8px; display: none; flex-direction: column; min-width: 280px; z-index: 4; }
+
+  /* every panel gets a title row with a close button, and Esc closes it too */
+  .phead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .phead h3 { margin: 0; }
+  .pclose { flex: none; width: 34px; height: 34px; border: 2px solid var(--line); background: #fff; color: var(--navy); border-radius: 50%; font-size: 19px; font-weight: 800; line-height: 1; display: grid; place-items: center; padding: 0; }
+  .pclose:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .menu .phint { font-size: 13px; color: var(--muted); padding: 2px 14px 6px; }
+  .menu .pclose { margin: 2px 6px 4px auto; }
   .menu.open { display: flex; }
   .menu button { background: none; border: 0; text-align: left; padding: 12px 14px; border-radius: 10px; font-size: 18px; color: var(--navy); }
   .menu button:hover { background: var(--paper); }
@@ -206,6 +266,7 @@
   <button id="newBtn">Set up a new game</button>
   <button id="freshBtn">Mark all questions unused</button>
   <button id="fsBtn">Full screen (F)</button>
+  <button class="pclose" id="menuClose" aria-label="Close menu" title="Close (Esc)">&times;</button>
   <div class="hint">Space or → moves on. Questions reveal on their own when time runs out or everyone answers. Click a player in the lobby to remove them.</div>
 </div>
 <div class="wins" id="wins"></div>
@@ -228,7 +289,7 @@ $pulse.innerHTML = ecgSvg();
 
 let pin = sessionStorage.getItem('pc_pin') || '';
 let st = null, setupMode = false, netMode = false, lastKey = '', joinUrl = '';
-let setup = { categories: null, perRound: 4, breaks: true, final: true };
+let setup = { categories: null, total: null, chunk: null, breaks: true, final: true };
 const seen = new Set();
 const timers = new Set();
 const clearTimers = () => { timers.forEach(f => f()); timers.clear(); };
@@ -281,16 +342,53 @@ document.addEventListener('keydown', e => {
   if (e.key === 'n' || e.key === 'N') toggleNet();
 });
 const $menu = document.getElementById('menu'), $gear = document.getElementById('gear');
-$gear.onclick = () => { const o = $menu.classList.toggle('open'); $gear.setAttribute('aria-expanded', o); };
-function toggleFs() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else document.exitFullscreen(); }
-document.getElementById('fsBtn').onclick = () => { toggleFs(); $menu.classList.remove('open'); };
-
 const $wins = document.getElementById('wins');
 const $ment = document.getElementById('ment');
+
+// One owner for every overlay, so there is always a way back out: the close
+// button in each panel, Esc, clicking the page behind it, or the Menu button.
+function closeOverlays(except) {
+  for (const el of [$menu, $wins, $ment]) if (el && el !== except) el.classList.remove('open');
+  $gear.setAttribute('aria-expanded', $menu.classList.contains('open'));
+}
+function toggleOverlay(el, onOpen) {
+  const opening = !el.classList.contains('open');
+  closeOverlays(opening ? el : null);
+  el.classList.toggle('open', opening);
+  $gear.setAttribute('aria-expanded', $menu.classList.contains('open'));
+  if (opening && onOpen) onOpen();
+  return opening;
+}
+$gear.onclick = () => toggleOverlay($menu);
+document.getElementById('menuClose').onclick = () => closeOverlays();
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if ($menu.classList.contains('open') || $wins.classList.contains('open') || $ment.classList.contains('open')) {
+    e.preventDefault();
+    closeOverlays();
+  }
+});
+// Clicking the page behind an overlay dismisses it. pointerdown rather than
+// click so it still works when the press starts on the projector screen.
+document.addEventListener('pointerdown', e => {
+  const t = e.target;
+  if (!t || typeof t.closest !== 'function') return;
+  if (t.closest('.menu, .wins, .ment, .controls')) return;
+  closeOverlays();
+});
+function toggleFs() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else document.exitFullscreen(); }
+document.getElementById('fsBtn').onclick = () => { toggleFs(); closeOverlays(); };
+
 const places = () => (st && st.places) || 3;
 
 // Where the networking QR should point. Host-entered mentor links win over a
 // Linktree in NETWORK_URL, because the mentors page is one scan then one tap.
+// "all 1 mentors' LinkedIn" is the kind of thing that ends up on a projector.
+function mentorPhrase(n) {
+  if (!n) return "the mentors'";
+  return n === 1 ? "our mentor's" : `all ${n} mentors'`;
+}
+
 function netTarget() {
   if (!st) return null;
   if (st.mentors && st.mentors.length) {
@@ -303,24 +401,20 @@ function netTarget() {
 function toggleNet() {
   if (!netTarget()) return flash('Add mentor links from Menu, or set NETWORK_URL in Vercel.');
   netMode = !netMode;
-  $menu.classList.remove('open');
+  closeOverlays();
   render(true);
 }
 document.getElementById('netBtn').onclick = toggleNet;
 
 // Mentor links. Painted once on open and never from polling, so it can't wipe
 // what the host is part-way through typing.
-document.getElementById('mentBtn').onclick = () => {
-  $menu.classList.remove('open');
-  const opening = !$ment.classList.contains('open');
-  $ment.classList.toggle('open');
-  if (opening) paintMentors();
-};
+document.getElementById('mentBtn').onclick = () => toggleOverlay($ment, () => paintMentors());
 
 function paintMentors(note) {
   const text = (st && st.mentorsText) || '';
   const n = (st && st.mentors || []).length;
-  $ment.innerHTML = `<h3>Mentor links</h3>
+  $ment.innerHTML = `<div class="phead"><h3>Mentor links</h3>
+      <button class="pclose" id="mentClose" aria-label="Close mentor links" title="Close (Esc)">&times;</button></div>
     <p class="sub">One mentor per line: <code>Name | Role at Company | https://linkedin.com/in/…</code><br>
       The role is optional. Lines starting with <code>#</code> are ignored. Players see these at
       <b>${esc(location.origin)}/mentors</b>, and the networking QR points there once there is at least one.</p>
@@ -329,6 +423,7 @@ Ravi Singh | Security Lead | https://linkedin.com/in/example2"></textarea>
     <div class="acts"><button id="mentSave">Save links</button>
       <span class="count">${n} saved</span></div>
     ${note || ''}`;
+  document.getElementById('mentClose').onclick = () => closeOverlays();
   document.getElementById('mentText').value = text;
   document.getElementById('mentSave').onclick = async () => {
     const btn = document.getElementById('mentSave');
@@ -352,37 +447,63 @@ Ravi Singh | Security Lead | https://linkedin.com/in/example2"></textarea>
     }
   };
 }
-document.getElementById('winBtn').onclick = () => { $menu.classList.remove('open'); $wins.classList.toggle('open'); paintWinners(true); };
+document.getElementById('winBtn').onclick = () => toggleOverlay($wins, () => paintWinners(true));
 document.getElementById('freshBtn').onclick = async () => {
-  $menu.classList.remove('open');
+  closeOverlays();
   if (!confirm('Mark every question in the bank as unused? Do this once before the event so the real game draws fresh questions after your rehearsals.')) return;
   try { const r = await hostApi('POST', { action: 'resetUsage' }); flash(`${r.reset} questions are back in the fresh pool.`); st = await hostApi(); render(true); }
   catch (e) { flash(e.message); }
 };
 
 // The winners list: every podium place ever recorded, newest game first.
+// Rows are grouped by game, otherwise several "1st" in a row reads as a bug.
 let winsKey = '';
 function paintWinners(force) {
   if (!$wins.classList.contains('open')) { winsKey = ''; return; }
-  const w = (st && st.winners) || { count: 0, names: [], winners: [] };
+  const w = (st && st.winners) || { count: 0, shown: 0, names: [], winners: [] };
   const key = w.count + ':' + w.names.join('|');
   if (key === winsKey && !force) return;
   winsKey = key;
-  const rows = w.winners.map(r => `<li><span class="pl">${r.place}${['st', 'nd', 'rd'][r.place - 1] || 'th'}</span>
-    ${avatarSvg(r.avatar, { size: 30 })}<span class="nm2">${esc(r.name)}</span><span class="sc">${(r.score || 0).toLocaleString()}</span></li>`).join('');
-  $wins.innerHTML = `<h3>Winners list</h3>
+
+  const when = ts => {
+    const d = new Date(ts);
+    if (isNaN(d)) return 'Earlier game';
+    const mins = Math.round((Date.now() - d.getTime()) / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins} min ago`;
+    if (mins < 1440) return `${Math.round(mins / 60)} h ago`;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
+
+  let body = '', lastGame = null, games = 0;
+  for (const r of w.winners) {
+    if (r.game_id !== lastGame) {
+      if (lastGame !== null) body += '</ol>';
+      lastGame = r.game_id;
+      games++;
+      body += `<div class="gsep">Game ${games} &middot; ${esc(when(r.recorded_at))}</div><ol>`;
+    }
+    body += `<li><span class="pl">${r.place}${['st', 'nd', 'rd'][r.place - 1] || 'th'}</span>
+      ${avatarSvg(r.avatar, { size: 30 })}<span class="nm2">${esc(r.name)}</span><span class="sc">${(r.score || 0).toLocaleString()}</span></li>`;
+  }
+  if (lastGame !== null) body += '</ol>';
+
+  const unique = w.names.length;
+  $wins.innerHTML = `<div class="phead"><h3>Winners list</h3>
+      <button class="pclose" id="winClose" aria-label="Close winners list" title="Close (Esc)">&times;</button></div>
     <p class="sub">The top ${places()} of every finished game, saved automatically. Newest first.</p>
-    ${rows ? `<ol>${rows}</ol>` : '<p class="sub">No games have finished yet. The podium is saved the moment a game ends.</p>'}
-    ${w.count > w.shown ? `<p class="sub">Showing the newest ${w.shown} of ${w.count}. The full list is at /api/winners</p>` : ''}
+    <div class="scroll">${body || '<p class="sub">No games have finished yet. The podium is saved the moment a game ends.</p>'}</div>
+    ${w.count > w.shown ? `<p class="ep">Showing the newest ${w.shown} of ${w.count}.</p>` : ''}
     <div class="acts">
-      <button id="copyWins" ${w.names.length ? '' : 'disabled'}>Copy ${w.names.length} name${w.names.length === 1 ? '' : 's'}</button>
+      <button id="copyWins" ${unique ? '' : 'disabled'}>Copy ${unique} name${unique === 1 ? '' : 's'}</button>
       <button class="warn" id="clearWins" ${w.count ? '' : 'disabled'}>Clear list</button>
     </div>
-    <p class="ep">Other activities can read this list at <b>${esc(location.origin)}/api/winners</b></p>`;
+    <p class="ep">${unique < w.count ? `${w.count} places, ${unique} different ${unique === 1 ? 'person' : 'people'}. Copy gives the names once each.<br>` : ''}Other activities can read this list at <b>${esc(location.origin)}/api/winners</b></p>`;
+
+  document.getElementById('winClose').onclick = () => closeOverlays();
   const copy = document.getElementById('copyWins');
   if (copy) copy.onclick = async () => {
-    const text = w.names.join('\n');
-    try { await navigator.clipboard.writeText(text); copy.textContent = 'Copied'; setTimeout(() => paintWinners(true), 1500); }
+    try { await navigator.clipboard.writeText(w.names.join('\n')); copy.textContent = 'Copied'; setTimeout(() => paintWinners(true), 1500); }
     catch (err) { flash('Copy failed. The list is also at /api/winners'); }
   };
   const clear = document.getElementById('clearWins');
@@ -392,8 +513,9 @@ function paintWinners(force) {
     catch (err) { flash(err.message); }
   };
 }
+
 document.getElementById('newBtn').onclick = () => {
-  $menu.classList.remove('open');
+  closeOverlays();
   const unfinished = st && st.phase !== 'none' && st.phase !== 'final' && st.phase !== 'lobby';
   const msg = unfinished
     ? 'Set up a new game? This game has not reached the final screen, so its top ' + places() + ' will NOT be saved to the winners list. Scores reset. Player profiles stay.'
@@ -451,41 +573,106 @@ function patch() {
 // ---------- setup ----------
 function openSetup() { setupMode = true; render(true); }
 
-function setupView() {
+// Everything the setup screen derives from the current choices. Kept separate so
+// a click can update the numbers in place: rebuilding $main would reset .setup's
+// scroll position to the top and throw the host back up the page on every press.
+function setupFacts() {
   const bank = st.bank || [];
+  const R = st.ranges || { total: { min: 4, max: 60, def: 24 }, chunk: { min: 3, max: 10, def: 6 } };
+  const supply = setup.categories.reduce((n, id) => {
+    const b = bank.find(x => x.id === id);
+    return n + (b ? b.total : 0);
+  }, 0);
+  const ceiling = supply ? Math.min(R.total.max, Math.max(R.total.min, supply)) : R.total.max;
+  // Only pull the count down to what the bank holds while a category is actually
+  // selected, so deselecting everything doesn't silently reset the host's number.
+  if (supply) setup.total = Math.min(Math.max(setup.total, R.total.min), ceiling);
+  const drawn = Math.min(setup.total, supply);
+  const asked = drawn + (setup.final && supply > drawn ? 1 : 0);
+  const stops = Math.max(1, Math.ceil(drawn / setup.chunk));
+  return { bank, R, supply, ceiling, drawn, asked, stops, mins: Math.round(asked * 0.75 + stops * 0.5 + 4) };
+}
+
+function syncSetup() {
+  const f = setupFacts();
+  const set = (id, value, lo, hi, hint) => {
+    const box = document.getElementById(id);
+    if (!box) return;
+    const input = box.querySelector('input');
+    if (input && document.activeElement !== input) input.value = value;
+    if (input) { input.min = lo; input.max = hi; }
+    box.querySelector('[data-d="-1"]').disabled = value <= lo;
+    box.querySelector('[data-d="1"]').disabled = value >= hi;
+    const small = box.parentElement.querySelector('small');
+    if (small) small.textContent = hint;
+  };
+  set('total', setup.total, f.R.total.min, f.ceiling, f.supply ? `${f.supply} available` : 'pick a category');
+  set('chunk', setup.chunk, f.R.chunk.min, f.R.chunk.max, `${f.stops} ${f.stops === 1 ? 'stop' : 'stops'}`);
+  $main.querySelectorAll('.cat').forEach(b => b.setAttribute('aria-pressed', setup.categories.includes(b.dataset.id)));
+  const create = document.getElementById('create');
+  if (create) create.disabled = !setup.categories.length;
+  const sum = $main.querySelector('.summary');
+  if (sum) {
+    sum.innerHTML = `${f.asked} questions from ${setup.categories.length} ${setup.categories.length === 1 ? 'category' : 'categories'}, about ${f.mins} minutes`
+      + (f.drawn < setup.total ? ` &middot; the bank only has ${f.supply}, so ${f.drawn} will be asked` : '');
+  }
+}
+
+function setupView() {
+  const R = st.ranges || { total: { min: 4, max: 60, def: 24 }, chunk: { min: 3, max: 10, def: 6 } };
   // Defaults come from DEFAULT_CATEGORIES on the server, so the two can't drift.
-  if (!setup.categories) setup.categories = (st.defaultCategories || []).filter(id => bank.find(b => b.id === id && b.total));
-  // A category with fewer questions than perRound contributes only what it has,
-  // so count what the game will actually draw rather than the ideal.
-  const qCount = setup.categories.reduce((n, id) => {
-    const b = bank.find(x => x.id === id);
-    return n + Math.min(setup.perRound, b ? b.total : 0);
-  }, 0) + (setup.final ? 1 : 0);
-  const short = setup.categories.filter(id => {
-    const b = bank.find(x => x.id === id);
-    return b && b.total < setup.perRound;
-  }).map(id => bank.find(x => x.id === id).title);
+  if (!setup.categories) setup.categories = (st.defaultCategories || []).filter(id => (st.bank || []).find(b => b.id === id && b.total));
+  if (setup.total == null) setup.total = R.total.def;
+  if (setup.chunk == null) setup.chunk = R.chunk.def;
+  const f = setupFacts();
+
+  // The value is a real input, so the host can type 24 instead of pressing + 20 times.
+  const stepper = (id, value, lo, hi) => `<span class="step" id="${id}">
+    <button type="button" data-d="-1" aria-label="fewer">&minus;</button>
+    <input type="number" inputmode="numeric" value="${value}" min="${lo}" max="${hi}" aria-label="${id === 'total' ? 'Number of questions' : 'Questions between leaderboards'}">
+    <button type="button" data-d="1" aria-label="more">+</button></span>`;
+
   $main.innerHTML = `<section class="setup">
     <h1>Set up the game</h1>
-    <p class="lede">Each category becomes a round. Questions are drawn from the least-used in the bank, and answer order is shuffled every game.</p>
-    <div class="cats">${bank.map(b => `<button class="cat" data-id="${b.id}" aria-pressed="${setup.categories.includes(b.id)}" ${b.total ? '' : 'disabled'}>
+    <p class="lede">Questions are drawn at random across the categories you pick, evenly and least-used first, with answer order shuffled every game.</p>
+    <div class="cats">${f.bank.map(b => `<button class="cat" data-id="${b.id}" aria-pressed="${setup.categories.includes(b.id)}" ${b.total ? '' : 'disabled'}>
       <span class="t">${esc(b.title)}</span><span class="b">${esc(b.blurb)}</span><span class="n">${b.total} questions, ${b.fresh} not used yet</span></button>`).join('')}</div>
     <div class="opts-row">
-      <span>Questions per round <span class="seg" id="per">${[3, 4, 5].map(n => `<button data-n="${n}" aria-pressed="${setup.perRound === n}">${n}</button>`).join('')}</span></span>
+      <span class="ctl">Questions ${stepper('total', setup.total, R.total.min, f.ceiling)} <small></small></span>
+      <span class="ctl">Leaderboard every ${stepper('chunk', setup.chunk, R.chunk.min, R.chunk.max)} <small></small></span>
       <label class="toggle"><input type="checkbox" id="breaks" ${setup.breaks ? 'checked' : ''}> Networking breaks</label>
       <label class="toggle"><input type="checkbox" id="final" ${setup.final ? 'checked' : ''}> Double-points final</label>
     </div>
-    <button class="create" id="create" ${setup.categories.length ? '' : 'disabled'}>Create game</button>
-    <span class="summary">${setup.categories.length} ${setup.categories.length === 1 ? 'round' : 'rounds'}, ${qCount} questions, about ${Math.round(qCount * 0.75 + 4)} minutes${short.length ? ` &middot; ${esc(short.join(', '))} ${short.length === 1 ? 'has' : 'have'} fewer than ${setup.perRound} questions in the bank` : ''}</span>
+    <button class="create" id="create">Create game</button>
+    <span class="summary"></span>
   </section>`;
+
   $main.querySelectorAll('.cat').forEach(b => b.onclick = () => {
     const id = b.dataset.id;
     setup.categories = setup.categories.includes(id) ? setup.categories.filter(c => c !== id) : [...setup.categories, id];
-    render(true);
+    syncSetup();
   });
-  $main.querySelectorAll('#per button').forEach(b => b.onclick = () => { setup.perRound = Number(b.dataset.n); render(true); });
-  document.getElementById('breaks').onchange = e => { setup.breaks = e.target.checked; render(true); };
-  document.getElementById('final').onchange = e => { setup.final = e.target.checked; render(true); };
+
+  const bind = (id, lo, hiOf) => {
+    const box = document.getElementById(id);
+    box.querySelectorAll('button').forEach(b => b.onclick = () => {
+      setup[id] = Math.min(hiOf(), Math.max(lo, setup[id] + Number(b.dataset.d)));
+      syncSetup();
+    });
+    const input = box.querySelector('input');
+    input.oninput = () => {
+      const v = parseInt(input.value, 10);
+      if (Number.isFinite(v)) { setup[id] = Math.min(hiOf(), Math.max(lo, v)); syncSetup(); }
+    };
+    // Snap the field back to the clamped value once the host is done typing.
+    input.onblur = () => { input.value = setup[id]; syncSetup(); };
+    input.onkeydown = e => { if (e.key === 'Enter') input.blur(); };
+  };
+  bind('total', R.total.min, () => setupFacts().ceiling);
+  bind('chunk', R.chunk.min, () => R.chunk.max);
+
+  document.getElementById('breaks').onchange = e => { setup.breaks = e.target.checked; syncSetup(); };
+  document.getElementById('final').onchange = e => { setup.final = e.target.checked; syncSetup(); };
   document.getElementById('create').onclick = async e => {
     e.target.disabled = true;
     try {
@@ -494,11 +681,13 @@ function setupView() {
       st = await hostApi(); render(true);
     } catch (err) { flash(err.message); e.target.disabled = false; }
   };
+  syncSetup();
 }
 
 // ---------- lobby ----------
 function lobbyView() {
   $main.innerHTML = `<section class="lobby">
+    <div class="watermark">${categoryArt('', { width: 420 })}</div>
     <div class="join">
       <h1 class="title">Pulse<br>Check</h1>
       <p class="lede2">Scan to make your player and join. No app, no sign-up.</p>
@@ -532,11 +721,12 @@ function paintWall() {
 
 // ---------- cards ----------
 function roundView(s) {
-  $main.innerHTML = `<section class="card">${categoryArt(s.cat, { width: 260, label: s.title })}
+  $main.innerHTML = `<section class="card">${categoryArt(s.cat, { width: 460, label: s.title })}
     <p class="sub">${esc(s.subtitle)}</p><h1>${esc(s.title)}</h1>${s.blurb ? `<p>${esc(s.blurb)}</p>` : ''}</section>`;
 }
 function breakView(s) {
-  $main.innerHTML = `<section class="card brk"><h1>${esc(s.title)}</h1><p>${esc(s.text)}</p>${s.seconds ? '<div class="big-secs" id="bsecs"></div>' : ''}</section>`;
+  $main.innerHTML = `<section class="card brk"><div class="watermark">${categoryArt('', { width: 420 })}</div>
+    <h1>${esc(s.title)}</h1><p>${esc(s.text)}</p>${s.seconds ? '<div class="big-secs" id="bsecs"></div>' : ''}</section>`;
   if (s.seconds) {
     const el = document.getElementById('bsecs');
     // The deadline comes from the server, so refreshing the host screen mid-break
@@ -552,7 +742,7 @@ function netView() {
   if (!t) { netMode = false; return render(true); }
   $main.innerHTML = `<section class="netfull">
     <div><h1>Go meet<br>the mentors.</h1>
-      <p>Scan it, then tap any ${t.count ? `of the ${t.count} ` : ''}mentor to open their LinkedIn. Send the request before you leave the room.</p>
+      <p>${t.count === 1 ? 'Scan it to open our mentor’s LinkedIn.' : `Scan it, then tap any ${t.count ? `of the ${t.count} ` : ''}mentors to open their LinkedIn.`} Send the request before you leave the room.</p>
       <div class="u">${esc(t.url)}</div></div>
     <div class="qr"><img src="${esc(t.qr)}" alt="QR code for the mentor links"></div>
   </section>`;
@@ -579,7 +769,7 @@ function tilesHtml(s, reveal) {
 }
 
 function questionView(s, reveal) {
-  const meta = `<div class="q-meta">${categoryArt(s.cat, { width: 64, draw: false })}<span class="ct">${esc(s.catTitle || '')}</span>${s.double ? '<span class="dbl">Double points</span>' : ''}</div>`;
+  const meta = `<div class="q-meta">${categoryArt(s.cat, { width: 180, draw: false })}<span class="ct">${esc(s.catTitle || '')}</span>${s.double ? '<span class="dbl">Double points</span>' : ''}</div>`;
   if (!reveal && Clock.now() < st.openAt) {
     $main.innerHTML = `<section class="q reading">${meta}<div><h2 class="q-text">${esc(s.text)}</h2><p class="opening">Answers open in <b id="open"></b></p></div></section>`;
     const el = document.getElementById('open');
@@ -607,7 +797,10 @@ function questionView(s, reveal) {
 // ---------- boards ----------
 function boardView() {
   const t = st.top || [];
-  $main.innerHTML = `<section class="board"><h2>Top ${t.length || 5} so far</h2>${t.map((p, i) =>
+  // st.slide at this point is the question just revealed, so the ground picks up
+  // whichever category the round ended on.
+  const mark = `<div class="watermark">${categoryArt(st.slide && st.slide.cat, { width: 460 })}</div>`;
+  $main.innerHTML = `<section class="board">${mark}<h2>Top ${t.length || 5} so far</h2>${t.map((p, i) =>
     `<div class="row"><span class="r">${i + 1}</span>${avatarSvg(p.avatar, { size: 60 })}<span>${esc(p.name)}</span><span class="s">${p.score.toLocaleString()}</span></div>`).join('') || '<p class="empty">No players yet.</p>'}</section>`;
 }
 
@@ -617,27 +810,35 @@ function finalView() {
   const t = st.top || [];
   if (!t.length) { $main.innerHTML = '<section class="board"><h2>Game over</h2><p class="empty">No one played this time.</p></section>'; return; }
   const n = places();
-  // Podium order is 2 - 1 - 3 so first place stands in the middle.
-  const win = (i, delay) => {
-    const p = t[i];
-    if (!p) return '<div></div>';
-    return `<div class="win p${i + 1} rise" style="animation-delay:${delay}ms">${medalArt(i + 1, i === 0 ? 62 : 50)}
-      ${avatarSvg(p.avatar, { size: 132, label: p.name })}
+  const winners = t.slice(0, n);
+  // Three winners stand 2 - 1 - 3 so first place is in the middle. Fewer than
+  // three just read left to right, with no empty slots to leave a gap.
+  const order = winners.length >= 3 ? [1, 0, 2] : winners.map((_, i) => i);
+  const delays = { 0: 0, 1: 120, 2: 240 };
+  const cards = order.map(i => {
+    const p = winners[i];
+    if (!p) return '';
+    return `<div class="win p${i + 1} rise" style="animation-delay:${delays[i] || 0}ms">
+      ${medalArt(i + 1, i === 0 ? 66 : 54)}
+      ${avatarSvg(p.avatar, { size: 152, label: p.name })}
       <div class="place">${PLACE_LABEL[i] || `${i + 1}th place`}</div>
       <div class="name">${esc(p.name)}</div>
       <div class="pts">${p.score.toLocaleString()} points</div></div>`;
-  };
-  const rest = t.slice(n).map((p, i) => `<span><b>${n + i + 1}.</b>${avatarSvg(p.avatar, { size: 36 })}${esc(p.name)} (${p.score.toLocaleString()})</span>`).join('');
+  }).join('');
+
+  const rest = t.slice(winners.length).map((p, i) => `<span><b>${winners.length + i + 1}.</b>${avatarSvg(p.avatar, { size: 36 })}${esc(p.name)} (${p.score.toLocaleString()})</span>`).join('');
   const netT = netTarget();
   const net = netT ? `<aside class="netcard fade-up" style="animation-delay:700ms">
       <h3>Keep the night going</h3>
-      <p>Scan to open ${netT.count ? `all ${netT.count} mentors'` : "the mentors'"} LinkedIn.</p>
+      <p>Scan to open ${mentorPhrase(netT.count)} LinkedIn.</p>
       <img src="${esc(netT.qr)}" alt="QR code for the mentor links">
       <div class="u">${esc(netT.url)}</div>
     </aside>` : '';
+  const heading = winners.length === 1 ? 'Our winner. Come up and claim your prize.'
+    : `Our top ${winners.length}. Come up and claim your prize.`;
   $main.innerHTML = `<section class="final${netT ? '' : ' no-net'}">
-    <h2>Our top ${Math.min(n, t.length)}. Come up and claim your prize.</h2>
-    <div class="podium">${win(1, 120)}${win(0, 0)}${win(2, 240)}</div>
+    <h2>${heading}</h2>
+    <div class="podium">${cards}</div>
     ${net}
     ${rest ? `<div class="runners fade-up" style="animation-delay:520ms">${rest}</div>` : ''}</section>`;
 }

@@ -76,9 +76,10 @@
   .match .avatar { margin: 16px auto 12px; box-shadow: 0 0 0 5px #fff; }
   .match .name { font-size: 38px; font-weight: 900; font-stretch: 112%; line-height: 1; }
   .match .tags { font-size: 18px; margin-top: 8px; opacity: .9; }
-  .slide-art { color: #fff; margin: 0 0 14px; align-self: flex-start; }
+  .slide-art { color: #fff; margin: 0 0 16px; align-self: flex-start; width: clamp(160px, 52vw, 260px); height: auto; }
   body.paper .slide-art { color: var(--navy); }
-  .qmeta .art { color: currentColor; opacity: .85; flex: none; }
+  .qmeta .art { color: currentColor; opacity: .9; flex: none; width: clamp(52px, 17vw, 88px); height: auto; }
+  .qmeta { align-items: center; }
 
   /* networking call to action */
   .net { display: block; width: 100%; margin-top: 22px; background: #fff; color: var(--navy); border-radius: 18px; padding: 18px; text-align: center; text-decoration: none; font-weight: 800; font-size: 19px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
@@ -220,7 +221,7 @@ function lobbyView() {
 function slideView(s) {
   setMood();
   if (s.type === 'talk') { $view.innerHTML = `<p class="msg">${esc(s.title)}</p><p class="note">${esc(s.text)}</p>`; return; }
-  $view.innerHTML = `${categoryArt(s.cat, { width: 150, label: s.title })}
+  $view.innerHTML = `${categoryArt(s.cat, { width: 260, label: s.title })}
     <p class="note">${esc(s.subtitle)}</p><p class="msg" style="margin-top:8px">${esc(s.title)}</p>${s.blurb ? `<p class="note">${esc(s.blurb)}</p>` : ''}`;
   const art = $view.querySelector('.art');
   if (art) art.classList.add('slide-art');
@@ -251,7 +252,7 @@ function questionView(s) {
     return;
   }
   if (Clock.now() < st.openAt) {
-    $view.innerHTML = `<div class="qmeta"><span>Question ${s.num} of ${s.total}${s.double ? ', double points' : ''}</span>${categoryArt(s.cat, { width: 44, draw: false })}</div>
+    $view.innerHTML = `<div class="qmeta"><span>Question ${s.num} of ${s.total}${s.double ? ', double points' : ''}</span>${categoryArt(s.cat, { width: 88, draw: false })}</div>
       <p class="qtext">${esc(s.text)}</p><p class="note">Answers open in</p><div class="ready" id="ready"></div>`;
     const el = document.getElementById('ready');
     timers.add(ecgCountdown($pulse, st.openAt, 3500, sec => { el.textContent = sec; }));
@@ -322,9 +323,9 @@ function rankView(title) {
 function networkCta() {
   const url = st.mentorCount ? '/mentors' : (st.network || '');
   if (!url) return '';
-  const sub = st.mentorCount
-    ? `Tap any of the ${st.mentorCount} mentors to open their LinkedIn`
-    : "Every mentor's LinkedIn and today's links";
+  const sub = !st.mentorCount ? "Every mentor's LinkedIn and today's links"
+    : st.mentorCount === 1 ? "Open our mentor's LinkedIn"
+    : `Tap any of the ${st.mentorCount} mentors to open their LinkedIn`;
   const target = st.mentorCount ? '' : ' target="_blank" rel="noopener noreferrer"';
   return `<a class="net" href="${esc(url)}"${target}>Meet the mentors<span>${esc(sub)}</span></a>`;
 }
