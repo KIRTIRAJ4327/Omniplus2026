@@ -67,7 +67,7 @@
   /* cards */
   .card { height: 100%; display: flex; flex-direction: column; justify-content: center; }
   .card .sub { font-size: 30px; color: var(--muted); margin: 0 0 12px; }
-  .card .art { color: var(--navy); margin: 0 0 18px; align-self: flex-start; }
+  .card .art { color: var(--navy); margin: 0 0 20px; align-self: flex-start; width: clamp(220px, 27vw, 470px); height: auto; }
   .card.brk .art { color: var(--pulse); }
   .card h1 { font-size: clamp(64px, 9vw, 170px); line-height: .9; font-weight: 900; font-stretch: 125%; margin: 0 0 22px; letter-spacing: -.02em; max-width: 14ch; }
   .card p { font-size: 34px; margin: 0; color: var(--muted); max-width: 32ch; line-height: 1.3; }
@@ -77,9 +77,10 @@
   /* question */
   .q { height: 100%; display: grid; grid-template-rows: auto auto 1fr; gap: 22px; }
   .q.reading { grid-template-rows: auto 1fr; }
-  .q-meta { display: flex; gap: 16px; align-items: center; font-size: 22px; color: var(--muted); }
-  .q-meta .art { color: var(--navy); flex: none; align-self: center; }
-  .q-meta .ct { font-weight: 700; color: var(--navy); }
+  .q-meta { display: flex; gap: 22px; align-items: center; font-size: 22px; color: var(--muted); }
+  .q-meta .art { color: var(--navy); flex: none; align-self: center; width: clamp(96px, 10vw, 180px); height: auto; }
+  .q-meta .ct { font-weight: 800; color: var(--navy); font-size: clamp(24px, 2.1vw, 40px); font-stretch: 112%; }
+  .reading .q-meta .art { width: clamp(120px, 13vw, 240px); }
   .dbl { background: var(--pulse); color: #fff; font-weight: 800; padding: 4px 14px; border-radius: 999px; }
   .q-head { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: start; }
   .q-text { font-size: clamp(36px, 3.5vw, 64px); line-height: 1.12; font-weight: 800; margin: 0; max-width: 32ch; }
@@ -101,6 +102,19 @@
   .tiles.reveal .tile.right { box-shadow: 0 0 0 6px var(--navy); animation: tile-pop .52s cubic-bezier(.3,.9,.3,1) .1s 2; }
   @keyframes tile-pop { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.035); } }
   .tiles.reveal .tile.right .n::before { content: "✓ "; }
+
+  /* watermark: the same artwork, large and faint, as a ground for busier screens */
+  /* `position` stays on .watermark itself and the lift rule skips it, otherwise
+     `.board > *` would win on equal specificity and drop it back into the flow. */
+  .watermark { position: absolute; pointer-events: none; opacity: .06; color: var(--navy); z-index: 0; }
+  .watermark .art { width: 100%; height: auto; }
+  .board, .lobby, .card.brk { position: relative; overflow: hidden; }
+  .board > *:not(.watermark),
+  .lobby > *:not(.watermark),
+  .card.brk > *:not(.watermark) { position: relative; z-index: 1; }
+  .board .watermark { right: -3%; bottom: 0; width: 44%; }
+  .card.brk .watermark { right: 2%; top: 50%; transform: translateY(-50%); width: 36%; color: var(--pulse); opacity: .09; }
+  .lobby .watermark { left: -2%; bottom: -2%; width: 30%; }
 
   /* boards */
   .board { height: 100%; display: flex; flex-direction: column; justify-content: center; max-width: 1100px; }
@@ -529,6 +543,7 @@ function setupView() {
 // ---------- lobby ----------
 function lobbyView() {
   $main.innerHTML = `<section class="lobby">
+    <div class="watermark">${categoryArt('', { width: 420 })}</div>
     <div class="join">
       <h1 class="title">Pulse<br>Check</h1>
       <p class="lede2">Scan to make your player and join. No app, no sign-up.</p>
@@ -562,11 +577,12 @@ function paintWall() {
 
 // ---------- cards ----------
 function roundView(s) {
-  $main.innerHTML = `<section class="card">${categoryArt(s.cat, { width: 260, label: s.title })}
+  $main.innerHTML = `<section class="card">${categoryArt(s.cat, { width: 460, label: s.title })}
     <p class="sub">${esc(s.subtitle)}</p><h1>${esc(s.title)}</h1>${s.blurb ? `<p>${esc(s.blurb)}</p>` : ''}</section>`;
 }
 function breakView(s) {
-  $main.innerHTML = `<section class="card brk"><h1>${esc(s.title)}</h1><p>${esc(s.text)}</p>${s.seconds ? '<div class="big-secs" id="bsecs"></div>' : ''}</section>`;
+  $main.innerHTML = `<section class="card brk"><div class="watermark">${categoryArt('', { width: 420 })}</div>
+    <h1>${esc(s.title)}</h1><p>${esc(s.text)}</p>${s.seconds ? '<div class="big-secs" id="bsecs"></div>' : ''}</section>`;
   if (s.seconds) {
     const el = document.getElementById('bsecs');
     // The deadline comes from the server, so refreshing the host screen mid-break
@@ -609,7 +625,7 @@ function tilesHtml(s, reveal) {
 }
 
 function questionView(s, reveal) {
-  const meta = `<div class="q-meta">${categoryArt(s.cat, { width: 64, draw: false })}<span class="ct">${esc(s.catTitle || '')}</span>${s.double ? '<span class="dbl">Double points</span>' : ''}</div>`;
+  const meta = `<div class="q-meta">${categoryArt(s.cat, { width: 180, draw: false })}<span class="ct">${esc(s.catTitle || '')}</span>${s.double ? '<span class="dbl">Double points</span>' : ''}</div>`;
   if (!reveal && Clock.now() < st.openAt) {
     $main.innerHTML = `<section class="q reading">${meta}<div><h2 class="q-text">${esc(s.text)}</h2><p class="opening">Answers open in <b id="open"></b></p></div></section>`;
     const el = document.getElementById('open');
@@ -637,7 +653,10 @@ function questionView(s, reveal) {
 // ---------- boards ----------
 function boardView() {
   const t = st.top || [];
-  $main.innerHTML = `<section class="board"><h2>Top ${t.length || 5} so far</h2>${t.map((p, i) =>
+  // st.slide at this point is the question just revealed, so the ground picks up
+  // whichever category the round ended on.
+  const mark = `<div class="watermark">${categoryArt(st.slide && st.slide.cat, { width: 460 })}</div>`;
+  $main.innerHTML = `<section class="board">${mark}<h2>Top ${t.length || 5} so far</h2>${t.map((p, i) =>
     `<div class="row"><span class="r">${i + 1}</span>${avatarSvg(p.avatar, { size: 60 })}<span>${esc(p.name)}</span><span class="s">${p.score.toLocaleString()}</span></div>`).join('') || '<p class="empty">No players yet.</p>'}</section>`;
 }
 
