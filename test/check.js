@@ -135,6 +135,23 @@ function svgErrors(svg) {
     // a page that draws art or avatars must actually load the script that defines them
     if (/categoryArt|medalArt/.test(code) && !/src="\/art\.js"/.test(html)) fail(`${f} uses the artwork helpers but does not load /art.js`);
     if (/avatarSvg/.test(code) && !/src="\/avatar\.js"/.test(html)) fail(`${f} uses avatarSvg but does not load /avatar.js`);
+
+    // Every id the script reaches for must exist somewhere: in the static markup,
+    // or in a template the script itself renders. A typo here is a silent null
+    // and a dead button, which is exactly the kind of thing nobody notices until
+    // it is on a projector in front of a room.
+    const wanted = [...code.matchAll(/getElementById\(\s*'([^']+)'\s*\)/g)].map(m => m[1]);
+    const declared = new Set([...html.matchAll(/[\s"']id=["']([^"']+)["']/g)].map(m => m[1]));
+    const missing = [...new Set(wanted)].filter(id => !declared.has(id));
+    if (missing.length) fail(`${f}: getElementById has no matching id for ${missing.join(', ')}`);
+    else ok(`${f}: all ${new Set(wanted).size} element ids resolve`);
+
+    // A click handler assigned to an id that is never rendered is equally dead.
+    const closers = [...code.matchAll(/querySelector(?:All)?\(\s*'([^']*)'/g)].map(m => m[1]);
+    for (const sel of closers) {
+      if (!/^[.#]?[\w-]+$/.test(sel)) continue;
+      if (sel.startsWith('#') && !declared.has(sel.slice(1))) fail(`${f}: querySelector('${sel}') has no matching id`);
+    }
   }
 }
 
