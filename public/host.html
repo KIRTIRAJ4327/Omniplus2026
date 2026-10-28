@@ -29,6 +29,13 @@
   .cat .n { font-size: 15px; color: var(--muted); margin-top: 6px; }
   .cat[aria-pressed="true"] .n::before { content: "✓ In the game · "; color: var(--a3); font-weight: 700; }
   .opts-row { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; margin: 28px 0; font-size: 20px; }
+  .ctl { display: inline-flex; align-items: center; gap: 10px; }
+  .ctl small { font-size: 15px; color: var(--muted); }
+  .step { display: inline-flex; align-items: center; border: 2px solid var(--navy); border-radius: 999px; overflow: hidden; }
+  .step button { background: #fff; border: 0; width: 42px; padding: 8px 0; font-size: 22px; font-weight: 800; line-height: 1; color: var(--navy); }
+  .step button:hover:not(:disabled) { background: var(--navy); color: #fff; }
+  .step button:disabled { opacity: .3; cursor: default; }
+  .step b { min-width: 46px; text-align: center; font-size: 20px; font-variant-numeric: tabular-nums; }
   .seg { display: inline-flex; border: 2px solid var(--navy); border-radius: 999px; overflow: hidden; margin-left: 10px; }
   .seg button { background: #fff; border: 0; padding: 8px 16px; font-weight: 700; }
   .seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
@@ -228,7 +235,7 @@ $pulse.innerHTML = ecgSvg();
 
 let pin = sessionStorage.getItem('pc_pin') || '';
 let st = null, setupMode = false, netMode = false, lastKey = '', joinUrl = '';
-let setup = { categories: null, perRound: 4, breaks: true, final: true };
+let setup = { categories: null, total: null, chunk: null, breaks: true, final: true };
 const seen = new Set();
 const timers = new Set();
 const clearTimers = () => { timers.forEach(f => f()); timers.clear(); };
@@ -453,37 +460,60 @@ function openSetup() { setupMode = true; render(true); }
 
 function setupView() {
   const bank = st.bank || [];
+  const R = (st.ranges || { total: { min: 4, max: 60, def: 24 }, chunk: { min: 3, max: 10, def: 6 } });
   // Defaults come from DEFAULT_CATEGORIES on the server, so the two can't drift.
   if (!setup.categories) setup.categories = (st.defaultCategories || []).filter(id => bank.find(b => b.id === id && b.total));
-  // A category with fewer questions than perRound contributes only what it has,
-  // so count what the game will actually draw rather than the ideal.
-  const qCount = setup.categories.reduce((n, id) => {
+  if (setup.total == null) setup.total = R.total.def;
+  if (setup.chunk == null) setup.chunk = R.chunk.def;
+
+  // The bank can't always supply what the host asks for, so show what the game
+  // will actually draw rather than the request.
+  const supply = setup.categories.reduce((n, id) => {
     const b = bank.find(x => x.id === id);
-    return n + Math.min(setup.perRound, b ? b.total : 0);
-  }, 0) + (setup.final ? 1 : 0);
-  const short = setup.categories.filter(id => {
-    const b = bank.find(x => x.id === id);
-    return b && b.total < setup.perRound;
-  }).map(id => bank.find(x => x.id === id).title);
+    return n + (b ? b.total : 0);
+  }, 0);
+  const ceiling = supply ? Math.min(R.total.max, Math.max(R.total.min, supply)) : R.total.max;
+  // Only pull the count down to what the bank holds while a category is actually
+  // selected, so deselecting everything doesn't silently reset the host's number.
+  if (supply) setup.total = Math.min(Math.max(setup.total, R.total.min), ceiling);
+  const drawn = Math.min(setup.total, supply);
+  const withFinal = drawn + (setup.final && supply > drawn ? 1 : 0);
+  const stops = Math.max(1, Math.ceil(drawn / setup.chunk));
+  const mins = Math.round(withFinal * 0.75 + stops * 0.5 + 4);
+
+  const stepper = (id, value, lo, hi) => `<span class="step" id="${id}">
+    <button data-d="-1" aria-label="fewer" ${value <= lo ? 'disabled' : ''}>&minus;</button>
+    <b>${value}</b>
+    <button data-d="1" aria-label="more" ${value >= hi ? 'disabled' : ''}>+</button></span>`;
+
   $main.innerHTML = `<section class="setup">
     <h1>Set up the game</h1>
-    <p class="lede">Each category becomes a round. Questions are drawn from the least-used in the bank, and answer order is shuffled every game.</p>
+    <p class="lede">Questions are drawn at random across the categories you pick, evenly and least-used first, with answer order shuffled every game.</p>
     <div class="cats">${bank.map(b => `<button class="cat" data-id="${b.id}" aria-pressed="${setup.categories.includes(b.id)}" ${b.total ? '' : 'disabled'}>
       <span class="t">${esc(b.title)}</span><span class="b">${esc(b.blurb)}</span><span class="n">${b.total} questions, ${b.fresh} not used yet</span></button>`).join('')}</div>
     <div class="opts-row">
-      <span>Questions per round <span class="seg" id="per">${[3, 4, 5].map(n => `<button data-n="${n}" aria-pressed="${setup.perRound === n}">${n}</button>`).join('')}</span></span>
+      <span class="ctl">Questions ${stepper('total', setup.total, R.total.min, ceiling)}
+        <small>${supply ? `${supply} available` : 'pick a category'}</small></span>
+      <span class="ctl">Leaderboard every ${stepper('chunk', setup.chunk, R.chunk.min, R.chunk.max)}
+        <small>${stops} ${stops === 1 ? 'stop' : 'stops'}</small></span>
       <label class="toggle"><input type="checkbox" id="breaks" ${setup.breaks ? 'checked' : ''}> Networking breaks</label>
       <label class="toggle"><input type="checkbox" id="final" ${setup.final ? 'checked' : ''}> Double-points final</label>
     </div>
     <button class="create" id="create" ${setup.categories.length ? '' : 'disabled'}>Create game</button>
-    <span class="summary">${setup.categories.length} ${setup.categories.length === 1 ? 'round' : 'rounds'}, ${qCount} questions, about ${Math.round(qCount * 0.75 + 4)} minutes${short.length ? ` &middot; ${esc(short.join(', '))} ${short.length === 1 ? 'has' : 'have'} fewer than ${setup.perRound} questions in the bank` : ''}</span>
+    <span class="summary">${withFinal} questions from ${setup.categories.length} ${setup.categories.length === 1 ? 'category' : 'categories'}, about ${mins} minutes${drawn < setup.total ? ` &middot; the bank only has ${supply}, so ${drawn} will be asked` : ''}</span>
   </section>`;
+
   $main.querySelectorAll('.cat').forEach(b => b.onclick = () => {
     const id = b.dataset.id;
     setup.categories = setup.categories.includes(id) ? setup.categories.filter(c => c !== id) : [...setup.categories, id];
     render(true);
   });
-  $main.querySelectorAll('#per button').forEach(b => b.onclick = () => { setup.perRound = Number(b.dataset.n); render(true); });
+  const step = (id, lo, hi) => $main.querySelectorAll(`#${id} button`).forEach(b => b.onclick = () => {
+    setup[id] = Math.min(hi, Math.max(lo, setup[id] + Number(b.dataset.d)));
+    render(true);
+  });
+  step('total', R.total.min, ceiling);
+  step('chunk', R.chunk.min, R.chunk.max);
   document.getElementById('breaks').onchange = e => { setup.breaks = e.target.checked; render(true); };
   document.getElementById('final').onchange = e => { setup.final = e.target.checked; render(true); };
   document.getElementById('create').onclick = async e => {

@@ -3,13 +3,13 @@
 Live QR quiz for **Omni Pulse Tech 2026** (Oct 30, BCTI, Humber Polytechnic). Players scan one QR code, build an avatar profile, and play on their phones while the projector runs the show.
 
 - **Profiles with avatars:** 9 traits (skin, hair incl. hijab and turban, glasses, headphones…), nickname, role and interest.
-- **122-question bank** across 7 categories (AI, cyber, cloud, careers, Canadian tech, code and data, TCS). Each game draws the least-used questions and shuffles answer order, so repeat games stay fresh.
+- **122-question bank** across 7 categories (AI, cyber, cloud, careers, Canadian tech, code and data, TCS). The host picks how many questions to ask and how often the leaderboard interrupts; questions are drawn at random across the chosen categories, evenly and least-used first, with answer order shuffled, so repeat games stay fresh.
 - **Fair timing:** every question shows alone for 3.5 seconds, then answers unlock on every phone at the same server-synced moment. Faster correct answers score more, with streak bonuses.
 - **Networking breaks:** "Meet your match" pairs players with similar interests and shows each phone who to go find. Plus talk prompts.
 - **Projector screen:** game setup, avatar wall lobby, heartbeat-line timer, auto-reveal when time is up or everyone answers, leaderboard and a three-place winners' podium.
 - **Winners list:** the top 3 of every finished game is saved automatically and served at `/api/winners`, so another activity can read the names. The host screen shows the running list with a copy button.
 - **Networking finish:** add your mentors' LinkedIn links from the host screen. The final screen shows a QR to a `/mentors` page, and every player's phone gets a button to the same place - one scan, then one tap per mentor.
-- **Category artwork:** each round opens with a monoline illustration drawn in the same stroke as the heartbeat timer. All inline SVG, so nothing extra is fetched on venue Wi-Fi.
+- **Category artwork:** every question is labelled with a monoline illustration of its category, drawn in the same stroke as the heartbeat timer. All inline SVG, so nothing extra is fetched on venue Wi-Fi.
 
 ## Stack
 Static pages + Vercel serverless functions (`/api`) + Postgres. No WebSockets: phones poll a public state endpoint that Vercel's edge caches for 1 second, so hundreds of phones cost roughly one function call per second.
@@ -47,9 +47,12 @@ URL=http://localhost:3000 HOST_PIN=1234 N=150 npm test    # simulates 150 phones
 ## Edit questions
 `lib/bank.js`. Add, edit or delete entries; they sync to the database the next time the host opens the host screen. Write the correct answer anywhere and set its index; 3–4 option questions are shuffled each game, 2-option ones (Fact/Fiction, Real/Scam) keep your order.
 
+Run `npm run check` afterwards — it catches a duplicate question, an answer index out
+of range, a missing fact and anything else that would only show up on the projector.
+
 ## Running the event
 - Space or → advances. Questions reveal automatically.
-- Leaderboard shows after each round. Final question is double points. Top 3 get the podium and a "come to the stage" screen on their phone.
+- Leaderboard shows every few questions, as often as you set on the setup screen. Final question is double points. Top 3 get the podium and a "come to the stage" screen on their phone.
 - **F** toggles full screen. **N** toggles the full-screen networking QR, for after the podium while people are standing up.
 - **Menu → Winners list** shows every saved winner, with a button to copy the names.
 - **Menu → Mentor links** is where the networking links go. Fill it in before the event.
@@ -107,5 +110,8 @@ The list survives new games, score resets and players being removed. Clear it fr
 
 ## Limits
 - One live game at a time (newest game is the live one). "Set up a new game" resets scores; profiles stay.
+- Questions per game: 4 to 60, and 3 to 10 between leaderboards. Both are set on the
+  setup screen. If the chosen categories hold fewer than you ask for, the game asks
+  what is there and the setup screen says so before you start.
 - Scoring: up to 1,000 per correct answer by speed, +100 per streak step (max +500), final doubled; ties go to faster total time.
 - Nicknames are unique across the whole database and profiles are kept between games, so a name used in a rehearsal stays taken.

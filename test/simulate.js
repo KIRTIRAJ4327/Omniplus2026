@@ -16,7 +16,7 @@ const pool = async (items, n, fn) => { const out = []; let i = 0; await Promise.
 (async () => {
   const bad = await call('host', { headers: { 'x-host-pin': 'nope' } });
   console.log('wrong PIN rejected:', bad.status === 401);
-  const created = await host('POST', { action: 'new', settings: { categories: ['ai', 'cyber', 'careers'], perRound: 3 } });
+  const created = await host('POST', { action: 'new', settings: { categories: ['ai', 'cyber', 'careers'], total: 12, chunk: 4 } });
   console.log('game created:', created.ok, 'questions:', created.questions);
 
   const run = Date.now().toString(36).slice(-4);

@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BANK, CATEGORIES, DEFAULT_CATEGORIES } from '../lib/bank.js';
 import { parseMentors, mentorsToText, MAX_MENTORS } from '../lib/mentor-text.js';
+import { buildPlan, pickRoundRobin, TOTAL_RANGE, CHUNK_RANGE } from '../lib/plan.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = f => fs.readFileSync(path.join(root, f), 'utf8');
@@ -182,6 +183,119 @@ function svgErrors(svg) {
   eq('editor text round-trips', parseMentors(mentorsToText(once)).mentors, once);
 
   ok('mentor links: parsing, validation, escaping and round-trip all correct');
+}
+
+// ---------- 5. game plan shape ----------
+// advance() decides when to show a leaderboard by comparing the `round` of the next
+// question with the current one, so these invariants are what make the host flow work.
+{
+  const row = (id, category) => ({
+    id, category, text: `Q${id}`, options: ['a', 'b', 'c', 'd'], answer: 0, fact: 'f', time_s: 20
+  });
+  let nextId = 1;
+  const rows = (n, cats = ['ai']) => Array.from({ length: n }, (_, i) => row(nextId++, cats[i % cats.length]));
+
+  let bad = 0;
+  const bust = m => { fail('plan: ' + m); bad++; };
+
+  // pools are consumed in place, so the draw must be even across categories
+  {
+    const pools = [rows(10, ['ai']), rows(10, ['cyber']), rows(10, ['cloud'])];
+    const picked = pickRoundRobin(pools.map(p => p.slice()), 9);
+    if (picked.length !== 9) bust(`round-robin drew ${picked.length}, wanted 9`);
+    const per = {};
+    for (const q of picked) per[q.category] = (per[q.category] || 0) + 1;
+    const spread = Object.values(per);
+    if (Math.max(...spread) - Math.min(...spread) > 1) bust(`uneven category spread: ${JSON.stringify(per)}`);
+    if (Object.keys(per).length !== 3) bust('round-robin missed a category');
+  }
+
+  // asking for more than the bank holds must degrade, not loop forever or repeat
+  {
+    const picked = pickRoundRobin([rows(3, ['ai']), rows(2, ['cyber'])], 40);
+    if (picked.length !== 5) bust(`exhausted pools gave ${picked.length}, wanted 5`);
+    if (new Set(picked.map(q => q.id)).size !== picked.length) bust('a question was drawn twice');
+  }
+
+  const cases = [
+    { total: 24, chunk: 6 }, { total: 30, chunk: 10 }, { total: 7, chunk: 3 },
+    { total: 6, chunk: 6 }, { total: 7, chunk: 6 }, { total: 4, chunk: 10 },
+    { total: TOTAL_RANGE.max, chunk: CHUNK_RANGE.max }, { total: TOTAL_RANGE.min, chunk: CHUNK_RANGE.min }
+  ];
+  for (const { total, chunk } of cases) {
+    for (const withFinal of [false, true]) {
+      const at = `total=${total} chunk=${chunk}${withFinal ? ' +final' : ''}`;
+      const picked = rows(total, ['ai', 'cyber', 'cloud']);
+      const finalRow = withFinal ? row(900000 + total, 'ai') : null;
+      const { plan, used, total: counted } = buildPlan({
+        picked, chunk, breaks: true, finalRow, categories: 3, talkPrompts: ['talk a', 'talk b']
+      });
+      const qs = plan.filter(s2 => s2.type === 'q');
+
+      if (counted !== total + (withFinal ? 1 : 0)) bust(`${at}: counted ${counted}`);
+      if (used.length !== counted) bust(`${at}: ${used.length} ids marked used for ${counted} questions`);
+      if (new Set(used).size !== used.length) bust(`${at}: duplicate id in used`);
+      // numbering must be contiguous 1..N, since the screen shows "Question n of N"
+      qs.forEach((q, i) => {
+        if (q.num !== i + 1) bust(`${at}: question ${i} numbered ${q.num}`);
+        if (q.total !== counted) bust(`${at}: question ${i} says total ${q.total}`);
+      });
+      // a leaderboard must fall every `chunk` questions and nowhere else
+      const normal = withFinal ? qs.slice(0, -1) : qs;
+      normal.forEach((q, i) => {
+        const wantRound = Math.floor(i / chunk);
+        if (q.round !== wantRound) bust(`${at}: question ${i} in round ${q.round}, wanted ${wantRound}`);
+      });
+      if (withFinal) {
+        const last = qs[qs.length - 1];
+        if (last.round !== 'final') bust(`${at}: final question round is ${last.round}`);
+        if (!last.double) bust(`${at}: final question is not double points`);
+        if (plan[plan.length - 1] !== last) bust(`${at}: final question is not the last slide`);
+        // its round differs from the one before, so a leaderboard precedes it
+        if (normal.length && normal[normal.length - 1].round === 'final') bust(`${at}: no leaderboard before the final`);
+      }
+      // the opening card must not be a question, or the lobby jumps straight into one
+      if (plan[0].type !== 'round' || plan[0].round !== 'intro') bust(`${at}: plan does not open with the intro card`);
+      // two non-question slides in a row would make advance() skip a leaderboard
+      for (let i = 1; i < plan.length - 1; i++) {
+        const a2 = plan[i], b2 = plan[i + 1];
+        if (a2.type !== 'q' && b2.type !== 'q' && !(a2.round === 'final' || b2.round === 'final')) {
+          bust(`${at}: back-to-back non-question slides at ${i} (${a2.type}, ${b2.type})`);
+        }
+      }
+      // breaks only ever land on a chunk boundary
+      plan.forEach((sl, i) => {
+        if (sl.type !== 'match' && sl.type !== 'talk') return;
+        const before = plan.slice(0, i).filter(x => x.type === 'q').length;
+        if (before % chunk !== 0 && before !== total) bust(`${at}: break after ${before} questions is not a chunk boundary`);
+      });
+    }
+  }
+
+  // breaks off means no break slides at all
+  {
+    const { plan } = buildPlan({ picked: rows(30, ['ai']), chunk: 5, breaks: false, categories: 1, talkPrompts: ['t'] });
+    if (plan.some(sl => sl.type === 'match' || sl.type === 'talk')) bust('breaks:false still produced a break slide');
+  }
+
+  // a 2-option question keeps the host's order; 4-option answers get shuffled
+  {
+    const two = { id: 1, category: 'ai', text: 'q', options: ['Fact', 'Fiction'], answer: 1, fact: 'f', time_s: 20 };
+    const { plan } = buildPlan({ picked: [two], chunk: 6, breaks: false, categories: 1 });
+    const q = plan.find(sl => sl.type === 'q');
+    if (q.options[0] !== 'Fact' || q.answer !== 1) bust('a 2-option question was reordered');
+  }
+  {
+    // whatever the shuffle does, answer must still index the correct option
+    for (let i = 0; i < 200; i++) {
+      const src = { id: 1, category: 'ai', text: 'q', options: ['right', 'w1', 'w2', 'w3'], answer: 0, fact: 'f', time_s: 20 };
+      const { plan } = buildPlan({ picked: [src], chunk: 6, breaks: false, categories: 1 });
+      const q = plan.find(sl => sl.type === 'q');
+      if (q.options[q.answer] !== 'right') { bust('shuffling moved the answer index off the correct option'); break; }
+    }
+  }
+
+  if (!bad) ok(`game plan: ${cases.length * 2} configurations, round-robin draw, numbering, leaderboard and break placement all correct`);
 }
 
 console.log(fails ? `\n${fails} check${fails === 1 ? '' : 's'} failed.` : '\nAll offline checks passed.');
