@@ -36,3 +36,29 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: 0s !important; animation: none !important; }
 }
+
+/* ---------- category artwork ---------- */
+/* Monoline, same stroke family as the ECG line. Two tones: currentColor + --pulse. */
+.art { display: block; overflow: visible; }
+.art .ln, .art .accent-ln { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.art .ln { stroke: currentColor; }
+.art .base-ln { opacity: .22; }
+.art .accent-ln { stroke: var(--pulse); }
+.art .accent { fill: var(--pulse); stroke: none; transform-box: fill-box; transform-origin: center; }
+.art .medal-n { fill: currentColor; stroke: none; font-family: var(--font); font-size: 21px; font-weight: 900; font-stretch: 125%; }
+
+/* The art draws itself on: baseline first, then the motif, then the accent lands. */
+@keyframes art-draw { to { stroke-dashoffset: 0; } }
+@keyframes art-pop { from { transform: scale(0); opacity: 0; } 60% { transform: scale(1.18); } to { transform: scale(1); opacity: 1; } }
+.art.draw .ln, .art.draw .accent-ln { stroke-dasharray: 100; stroke-dashoffset: 100; animation: art-draw .75s cubic-bezier(.3,.7,.2,1) .22s forwards; }
+.art.draw .base-ln { animation-duration: .45s; animation-delay: 0s; }
+.art.draw .accent-ln { animation-delay: .72s; }
+.art.draw .accent { animation: art-pop .5s cubic-bezier(.2,1.5,.4,1) .78s backwards; }
+
+/* ---------- shared motion ---------- */
+@keyframes rise { from { transform: translateY(26px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fade-up { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes bump { 0%, 100% { transform: scale(1); } 32% { transform: scale(1.13); } }
+@keyframes ring { from { box-shadow: 0 0 0 0 var(--pulse); } to { box-shadow: 0 0 0 18px rgba(255, 77, 109, 0); } }
+.rise { animation: rise .55s cubic-bezier(.2,.9,.25,1) backwards; }
+.fade-up { animation: fade-up .4s ease-out backwards; }

@@ -10,16 +10,22 @@ const AV = {
   acc: ['None', 'Glasses', 'Shades', 'Headphones'],
   shirt: ['#1B2A4E', '#E23D4B', '#2F6FDE', '#F2A900', '#1E9E6A', '#F5F5F5']
 };
-const AVATAR_PARTS = Object.fromEntries(Object.entries(AV).map(([k, v]) => [k, v.length]));
 const INK = '#17121D';
 
+const AVATAR_PRESETS = [
+  { name: 'Classic', avatar: { bg: 2, skin: 1, hair: 1, hairColor: 0, eyes: 0, mouth: 0, facial: 0, acc: 0, shirt: 0 } },
+  { name: 'Creative', avatar: { bg: 3, skin: 0, hair: 4, hairColor: 4, eyes: 1, mouth: 1, facial: 0, acc: 1, shirt: 1 } },
+  { name: 'Curious', avatar: { bg: 5, skin: 2, hair: 3, hairColor: 2, eyes: 3, mouth: 3, facial: 0, acc: 0, shirt: 2 } },
+  { name: 'Bright', avatar: { bg: 0, skin: 3, hair: 5, hairColor: 5, eyes: 2, mouth: 0, facial: 0, acc: 3, shirt: 3 } },
+  { name: 'Builder', avatar: { bg: 6, skin: 4, hair: 2, hairColor: 1, eyes: 0, mouth: 2, facial: 1, acc: 0, shirt: 4 } },
+  { name: 'Focused', avatar: { bg: 1, skin: 5, hair: 7, hairColor: 3, eyes: 0, mouth: 0, facial: 0, acc: 1, shirt: 2 } },
+  { name: 'Confident', avatar: { bg: 7, skin: 2, hair: 8, hairColor: 0, eyes: 2, mouth: 2, facial: 0, acc: 2, shirt: 1 } },
+  { name: 'Easygoing', avatar: { bg: 4, skin: 1, hair: 6, hairColor: 6, eyes: 1, mouth: 1, facial: 2, acc: 0, shirt: 4 } }
+];
+
 function randomAvatar() {
-  const r = n => Math.floor(Math.random() * n);
-  const a = {};
-  for (const [k, n] of Object.entries(AVATAR_PARTS)) a[k] = r(n);
-  if (Math.random() < 0.55) a.facial = 0;
-  if (Math.random() < 0.5) a.acc = 0;
-  return a;
+  const preset = AVATAR_PRESETS[Math.floor(Math.random() * AVATAR_PRESETS.length)];
+  return { ...preset.avatar };
 }
 
 let avatarUid = 0;

@@ -74,7 +74,22 @@ const pool = async (items, n, fn) => { const out = []; let i = 0; await Promise.
   console.log('podium:', st.top.map(t => `${t.name}=${t.score}`).join(', '));
   const ranks = await pool(players, 40, p => call('me', { headers: { 'x-player-token': p.token } }));
   const set = new Set(ranks.map(r => r.rank));
-  console.log('distinct ranks:', set.size, 'of', N, '| winner rank-1 score matches podium:', ranks.find(r => r.rank === 1).score === st.top[0].score);
+  const first = ranks.find(r => r.rank === 1);
+  console.log('distinct ranks:', set.size, 'of', N, '| winner rank-1 score matches podium:', !!first && !!st.top[0] && first.score === st.top[0].score);
+
+  // the winners list the other activity reads
+  const w = await call('winners');
+  const places = st.places || 3;
+  const expect = st.top.slice(0, places).map(t => t.name);
+  const got = w.winners.slice(0, places).map(r => r.name);
+  console.log('winners saved:', JSON.stringify(got), '| matches podium:', JSON.stringify(got) === JSON.stringify(expect));
+  console.log('winners names list:', w.names.length >= expect.length, '| flat names:', JSON.stringify(w.names.slice(0, places)));
+  const placesSeen = w.winners.slice(0, places).map(r => r.place).join(',');
+  console.log('places numbered 1..' + places + ':', placesSeen === Array.from({ length: places }, (_, i) => i + 1).join(','));
+  // advancing again at the final screen must not append the podium twice
+  await host('POST', { action: 'next', v: st.v });
+  const w2 = await call('winners');
+  console.log('winners recorded once only:', w2.count === w.count, `(${w.count})`);
   const stale = await host('POST', { action: 'next', v: st.v - 3 });
   console.log('stale host action ignored:', stale.stale === true || stale.ok === true);
   const pub = await fetch(URL_ + '/api/state');
