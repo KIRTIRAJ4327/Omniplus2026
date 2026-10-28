@@ -57,7 +57,7 @@ function startPolling(fetcher, onChange, { interval = 1000, onError } = {}) {
         const st = await fetcher();
         fails = 0;
         onError && onError(null);
-        const key = st.v + ':' + (st.id || '') + ':' + (st.players ?? '') + ':' + (st.answered ?? '') + ':' + (st.roster ? st.roster.length : '');
+        const key = [st.v, st.id || '', st.players ?? '', st.answered ?? '', st.roster ? st.roster.length : '', st.winners ? st.winners.count : ''].join(':');
         if (key !== last) { last = key; onChange(st); }
       } catch (e) {
         fails++;

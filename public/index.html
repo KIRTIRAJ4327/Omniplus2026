@@ -38,12 +38,14 @@
   .builder-head { position: sticky; top: 0; z-index: 2; background: var(--paper); display: flex; align-items: center; gap: 16px; padding: 8px 0 14px; margin: 0 -2px; }
   .builder-head .avatar { box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--navy); }
   .builder-head h2 { font-size: 26px; font-stretch: 112%; font-weight: 900; margin: 0 0 6px; line-height: 1; }
-  .trait { margin: 14px 0 0; }
-  .trait-label { font-size: 14px; font-weight: 700; margin: 0 0 6px; color: var(--muted); }
-  .options { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; }
-  .options::-webkit-scrollbar { display: none; }
-  .opt-av { border: 0; padding: 0; background: none; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px transparent; }
-  .opt-av[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--navy), 0 0 0 5px var(--pulse); }
+  .preset-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 14px 0 8px; }
+  .preset-heading .label { font-size: 15px; font-weight: 800; }
+  .preset-heading .hint { font-size: 13px; color: var(--muted); }
+  .preset-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .preset { min-width: 0; min-height: 94px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 4px; border: 2px solid #D9DDE5; border-radius: 10px; background: #fff; color: var(--navy); font: inherit; font-size: 12px; font-weight: 700; }
+  .preset .avatar { width: 52px; height: 52px; }
+  .preset[aria-pressed="true"] { border-color: var(--pulse); background: #FFF4F5; box-shadow: inset 0 0 0 1px var(--pulse); }
+  .preset:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
   .field { margin-top: 22px; }
   .field label, .field .label { display: block; font-size: 15px; font-weight: 800; margin-bottom: 8px; }
   input[type=text] { width: 100%; font: inherit; font-size: 20px; padding: 14px 16px; border-radius: 14px; border: 2px solid var(--navy); color: var(--navy); background: #fff; }
@@ -59,9 +61,9 @@
   .qtext { font-size: 20px; line-height: 1.3; font-weight: 700; margin: 0 0 16px; }
   .qmeta { display: flex; justify-content: space-between; font-size: 14px; opacity: .8; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
   .ready { font-size: 96px; font-weight: 900; font-stretch: 125%; line-height: 1; margin: 18px 0 6px; font-variant-numeric: tabular-nums; color: var(--pulse); }
-  .opts { display: grid; gap: 10px; flex: 1; grid-auto-rows: 1fr; max-height: 62vh; }
+  .opts { display: grid; gap: 10px; flex: 1; grid-auto-rows: minmax(64px, auto); align-content: stretch; max-height: 64vh; overflow-y: auto; }
   .opts.two { grid-template-columns: 1fr 1fr; }
-  .opt { display: flex; align-items: center; gap: 14px; border: 0; border-radius: 16px; background: var(--c); color: var(--on); padding: 14px 16px; font-size: 18px; font-weight: 700; text-align: left; line-height: 1.2; min-height: 64px; }
+  .opt { display: flex; align-items: center; gap: 14px; border: 0; border-radius: 16px; background: var(--c); color: var(--on); padding: 14px 16px; font-size: 18px; font-weight: 700; text-align: left; line-height: 1.2; min-height: 64px; overflow-wrap: anywhere; }
   .opts.two .opt { flex-direction: column; justify-content: center; text-align: center; font-size: 22px; }
   .opt .shape { font-size: 26px; }
   .opt:active { transform: scale(.98); }
@@ -74,6 +76,16 @@
   .match .avatar { margin: 16px auto 12px; box-shadow: 0 0 0 5px #fff; }
   .match .name { font-size: 38px; font-weight: 900; font-stretch: 112%; line-height: 1; }
   .match .tags { font-size: 18px; margin-top: 8px; opacity: .9; }
+  .slide-art { color: #fff; margin: 0 0 14px; align-self: flex-start; }
+  body.paper .slide-art { color: var(--navy); }
+  .qmeta .art { color: currentColor; opacity: .85; flex: none; }
+
+  /* networking call to action */
+  .net { display: block; width: 100%; margin-top: 22px; background: #fff; color: var(--navy); border-radius: 18px; padding: 18px; text-align: center; text-decoration: none; font-weight: 800; font-size: 19px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  .net span { display: block; font-size: 14px; font-weight: 600; opacity: .7; margin-top: 4px; }
+  .podium-badge { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 6px; color: var(--a2); }
+  .podium-badge .medal { color: var(--a2); }
+
   .banner { position: fixed; top: 0; left: 0; right: 0; background: var(--a2); color: var(--navy-deep); text-align: center; padding: calc(8px + env(safe-area-inset-top, 0px)) 8px 8px; font-weight: 700; display: none; z-index: 5; }
 </style>
 </head>
@@ -86,6 +98,7 @@
 </div>
 
 <script src="/avatar.js"></script>
+<script src="/art.js"></script>
 <script src="/common.js"></script>
 <script>
 const $view = document.getElementById('view');
@@ -119,7 +132,10 @@ async function loadMe(jitter = 0) {
   if (jitter) await sleep(Math.random() * jitter);
   try {
     me = await api('me', { headers: { 'x-player-token': token } });
-    if (me.answer && me.answer.choice !== null && me.answer.choice !== undefined && local.idx !== me.answer.idx) {
+    const got = me.answer && me.answer.choice !== null && me.answer.choice !== undefined;
+    // A different question, or the same one where we lost track of whether our
+    // answer landed: the server is the authority either way.
+    if (got && (local.idx !== me.answer.idx || local.status !== 'locked')) {
       local = { idx: me.answer.idx, choice: me.answer.choice, status: 'locked' };
     }
   } catch (e) {
@@ -203,9 +219,11 @@ function lobbyView() {
 
 function slideView(s) {
   setMood();
-  $view.innerHTML = s.type === 'talk'
-    ? `<p class="msg">${esc(s.title)}</p><p class="note">${esc(s.text)}</p>`
-    : `<p class="note">${esc(s.subtitle)}</p><p class="msg" style="margin-top:8px">${esc(s.title)}</p>${s.blurb ? `<p class="note">${esc(s.blurb)}</p>` : ''}`;
+  if (s.type === 'talk') { $view.innerHTML = `<p class="msg">${esc(s.title)}</p><p class="note">${esc(s.text)}</p>`; return; }
+  $view.innerHTML = `${categoryArt(s.cat, { width: 150, label: s.title })}
+    <p class="note">${esc(s.subtitle)}</p><p class="msg" style="margin-top:8px">${esc(s.title)}</p>${s.blurb ? `<p class="note">${esc(s.blurb)}</p>` : ''}`;
+  const art = $view.querySelector('.art');
+  if (art) art.classList.add('slide-art');
 }
 
 function matchView(s) {
@@ -226,12 +244,14 @@ function questionView(s) {
   if (mine && mine.status) {
     const i = mine.choice;
     if (mine.status === 'late') { $view.innerHTML = `<p class="msg">Time’s up.</p><p class="note">That answer didn’t make it in. Get ready for the next one.</p>`; return; }
-    $view.innerHTML = `<p class="msg">${mine.status === 'sending' ? 'Sending…' : 'Locked in.'}</p><p class="note">Waiting for the timer…</p>
-      <span class="picked c${i}">${SHAPES[i]}${esc(s.options[i])}</span>`;
+    const headline = mine.status === 'sending' ? 'Sending…' : mine.status === 'unsure' ? 'Still sending…' : 'Locked in.';
+    const sub = mine.status === 'unsure' ? 'Your signal dropped. Checking whether it got through.' : 'Waiting for the timer…';
+    $view.innerHTML = `<p class="msg">${headline}</p><p class="note">${sub}</p>
+      <span class="picked c${i}">${SHAPES[i]}<span>${esc(s.options[i])}</span></span>`;
     return;
   }
   if (Clock.now() < st.openAt) {
-    $view.innerHTML = `<div class="qmeta"><span>Question ${s.num} of ${s.total}${s.double ? ', double points' : ''}</span></div>
+    $view.innerHTML = `<div class="qmeta"><span>Question ${s.num} of ${s.total}${s.double ? ', double points' : ''}</span>${categoryArt(s.cat, { width: 44, draw: false })}</div>
       <p class="qtext">${esc(s.text)}</p><p class="note">Answers open in</p><div class="ready" id="ready"></div>`;
     const el = document.getElementById('ready');
     timers.add(ecgCountdown($pulse, st.openAt, 3500, sec => { el.textContent = sec; }));
@@ -255,18 +275,21 @@ async function answer(i) {
   local = { idx, choice: i, status: 'sending' };
   if (navigator.vibrate) navigator.vibrate(25);
   render(true);
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 4; attempt++) {
     try {
       await api('answer', { method: 'POST', body: { idx, choice: i }, headers: { 'x-player-token': token } });
       if (local.idx === idx) { local.status = 'locked'; render(true); }
       return;
     } catch (e) {
+      // The server rejected it outright: that is final.
       if (e.status === 409 || e.status === 400) { if (local.idx === idx) { local.status = 'late'; render(true); } return; }
       if (e.status === 401) return loadMe();
-      await sleep(400);
+      await sleep(350 * (attempt + 1));
     }
   }
-  if (local.idx === idx) { local.status = 'late'; render(true); }
+  // Out of retries on a network error. The answer may well have landed, so ask the
+  // server instead of telling the player they missed it.
+  if (local.idx === idx) { local.status = 'unsure'; render(true); loadMe(); }
 }
 
 function resultView(s) {
@@ -294,24 +317,34 @@ function rankView(title) {
     <p class="note">of ${me.of} players, with ${(me.score || 0).toLocaleString()} points and ${me.correct || 0} right.</p>`;
 }
 
+// Host-entered mentor links win over a Linktree in NETWORK_URL: the mentors page
+// is one tap per mentor instead of a link tree to navigate.
+function networkCta() {
+  const url = st.mentorCount ? '/mentors' : (st.network || '');
+  if (!url) return '';
+  const sub = st.mentorCount
+    ? `Tap any of the ${st.mentorCount} mentors to open their LinkedIn`
+    : "Every mentor's LinkedIn and today's links";
+  const target = st.mentorCount ? '' : ' target="_blank" rel="noopener noreferrer"';
+  return `<a class="net" href="${esc(url)}"${target}>Meet the mentors<span>${esc(sub)}</span></a>`;
+}
+
 function finalView() {
-  if (me.rank && me.rank <= 2) {
+  const places = st.places || 3;
+  if (me.rank && me.rank <= places) {
     setMood('good');
-    $view.innerHTML = `<p class="msg">You won ${me.rank === 1 ? '1st' : '2nd'} place.</p><p class="huge">${me.score.toLocaleString()}</p>
-      <p class="note">Head to the stage to claim your prize. Show this screen.</p>`;
+    $view.innerHTML = `<p class="podium-badge">${medalArt(me.rank, 44)}<b>${ordinal(me.rank)} place</b></p>
+      <p class="msg">You're on the podium.</p><p class="huge">${me.score.toLocaleString()}</p>
+      <p class="note">Head to the stage to claim your prize. Show this screen.</p>
+      ${networkCta()}`;
   } else {
     setMood();
     rankView('Final result');
-    $view.insertAdjacentHTML('beforeend', '<p class="note" style="margin-top:20px">Thanks for playing. Now go meet the employers in the Industry Marketplace.</p>');
+    $view.insertAdjacentHTML('beforeend', `<p class="note" style="margin-top:20px">Thanks for playing. Now go meet the mentors and the employers in the Industry Marketplace.</p>${networkCta()}`);
   }
 }
 
 // ---------- profile builder ----------
-const TRAITS = [
-  ['skin', 'Skin'], ['hair', 'Hair'], ['hairColor', 'Hair colour'], ['eyes', 'Eyes'], ['mouth', 'Mouth'],
-  ['facial', 'Facial hair'], ['acc', 'Extras'], ['shirt', 'Top'], ['bg', 'Background']
-];
-
 function profileView() {
   setMood('paper');
   const isNew = !token;
@@ -328,7 +361,8 @@ function profileView() {
       <div id="preview"></div>
       <div><h2>${isNew ? 'Your player' : 'Edit profile'}</h2><button class="ghost" id="shuffle" type="button">Randomize</button></div>
     </div>
-    <div id="traits"></div>
+    <div class="preset-heading"><span class="label" id="preset-label">Choose your avatar</span><span class="hint">Pick a look</span></div>
+    <div class="preset-grid" role="group" aria-labelledby="preset-label" id="presets"></div>
     <div class="field"><label for="nick">Nickname</label>
       <input type="text" id="nick" maxlength="18" autocomplete="nickname" autocapitalize="words" placeholder="e.g. Priya from Humber" value="${esc(draft.nickname)}">
     </div>
@@ -341,11 +375,11 @@ function profileView() {
       ${!isNew ? '<button class="link" id="cancel" style="color:var(--navy)">Back to the game</button>' : ''}
     </div>`;
   paintPreview();
-  paintTraits();
+  paintPresets();
   paintChips('roles', ROLE_LABELS, 'role');
   paintChips('ints', INTEREST_LABELS, 'interest');
   document.getElementById('nick').addEventListener('input', e => { draft.nickname = e.target.value; });
-  document.getElementById('shuffle').onclick = () => { draft.avatar = randomAvatar(); paintPreview(); paintTraits(); };
+  document.getElementById('shuffle').onclick = () => { draft.avatar = randomAvatar(); paintPreview(); paintPresets(); };
   document.getElementById('save').onclick = saveProfile;
   const cancel = document.getElementById('cancel');
   if (cancel) cancel.onclick = () => { draft = null; notice = ''; mode = 'game'; render(true); };
@@ -355,27 +389,20 @@ function paintPreview() {
   document.getElementById('preview').innerHTML = avatarSvg(draft.avatar, { size: 104, label: 'Your avatar' });
 }
 
-function paintTraits() {
-  const box = document.getElementById('traits');
-  const keep = {};
-  box.querySelectorAll('.options').forEach(o => { keep[o.dataset.trait] = o.scrollLeft; });
-  box.innerHTML = TRAITS.map(([k, label]) => {
-    const n = AVATAR_PARTS[k];
-    let btns = '';
-    for (let v = 0; v < n; v++) {
-      const cfg = { ...draft.avatar, [k]: v };
-      const name = typeof AV[k][v] === 'string' && !AV[k][v].startsWith('#') ? AV[k][v] : `${label} ${v + 1}`;
-      btns += `<button class="opt-av" type="button" data-k="${k}" data-v="${v}" aria-pressed="${draft.avatar[k] === v}" aria-label="${esc(name)}">${avatarSvg(cfg, { size: 52 })}</button>`;
-    }
-    return `<div class="trait"><p class="trait-label">${label}</p><div class="options" data-trait="${k}">${btns}</div></div>`;
+function paintPresets() {
+  const box = document.getElementById('presets');
+  box.innerHTML = AVATAR_PRESETS.map(({ name, avatar }) => {
+    const selected = Object.keys(avatar).every(k => draft.avatar[k] === avatar[k]);
+    return `<button class="preset" type="button" aria-pressed="${selected}" aria-label="${name}">${avatarSvg(avatar, { size: 52 })}<span>${name}</span></button>`;
   }).join('');
-  box.querySelectorAll('.options').forEach(o => { if (keep[o.dataset.trait]) o.scrollLeft = keep[o.dataset.trait]; });
   box.onclick = e => {
-    const b = e.target.closest('.opt-av');
-    if (!b) return;
-    draft.avatar[b.dataset.k] = Number(b.dataset.v);
+    const button = e.target.closest('.preset');
+    if (!button) return;
+    const preset = AVATAR_PRESETS.find(item => item.name === button.getAttribute('aria-label'));
+    if (!preset) return;
+    draft.avatar = { ...preset.avatar };
     paintPreview();
-    paintTraits();
+    paintPresets();
   };
 }
 
