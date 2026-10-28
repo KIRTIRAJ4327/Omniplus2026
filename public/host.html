@@ -83,6 +83,9 @@
   .q.reading { grid-template-rows: auto 1fr; }
   .q-meta { display: flex; gap: 22px; align-items: center; font-size: 22px; color: var(--muted); }
   .q-meta .art { color: var(--navy); flex: none; align-self: center; width: clamp(96px, 10vw, 180px); height: auto; }
+  /* The baseline belongs under the big round-card art; beside a line of text it
+     just reads as a stray rule. */
+  .q-meta .art .base-ln { display: none; }
   .q-meta .ct { font-weight: 800; color: var(--navy); font-size: clamp(24px, 2.1vw, 40px); font-stretch: 112%; }
   .reading .q-meta .art { width: clamp(120px, 13vw, 240px); }
   .dbl { background: var(--pulse); color: #fff; font-weight: 800; padding: 4px 14px; border-radius: 999px; }
@@ -97,11 +100,14 @@
   .ans { font-size: 20px; color: var(--muted); margin-top: 6px; }
   .ans b { color: var(--navy); font-size: 28px; font-variant-numeric: tabular-nums; }
   .fact { font-size: 26px; line-height: 1.35; max-width: 62ch; margin: 0; padding-left: 20px; border-left: 6px solid var(--pulse); }
-  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; min-height: 0; }
-  .tile { position: relative; overflow: hidden; display: flex; align-items: center; gap: 22px; padding: 20px 28px; border-radius: 18px; background: var(--c); color: var(--on); font-size: clamp(24px, 2.3vw, 40px); font-weight: 700; line-height: 1.15; min-height: 0; }
-  .tile .shape { font-size: 1.3em; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; min-height: 0; }
+  .tile { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 14px 22px; border-radius: 18px; background: var(--c); color: var(--on); font-size: clamp(17px, 1.75vw, 32px); font-weight: 700; line-height: 1.14; min-height: 0; }
+  /* The option text has to be allowed to shrink, or a long answer pushes the
+     count out of the tile and the two overlap. */
+  .tile > span:not(.n) { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+  .tile .shape { font-size: 1.25em; flex: none; }
   .tile .fill { position: absolute; left: 0; bottom: 0; height: 10px; background: currentColor; opacity: .5; width: 0; transition: width .8s ease-out; }
-  .tile .n { margin-left: auto; font-size: 1.2em; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .tile .n { flex: none; margin-left: auto; font-size: 1.15em; font-weight: 900; font-variant-numeric: tabular-nums; }
   .tiles.reveal .tile.wrong { background: #fff; color: #9AA4BC; box-shadow: inset 0 0 0 3px var(--line); }
   .tiles.reveal .tile.right { box-shadow: 0 0 0 6px var(--navy); animation: tile-pop .52s cubic-bezier(.3,.9,.3,1) .1s 2; }
   @keyframes tile-pop { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.035); } }
@@ -126,31 +132,37 @@
   .row { display: grid; grid-template-columns: 64px 64px 1fr auto; align-items: center; gap: 20px; padding: 12px 0; border-bottom: 2px solid var(--line); font-size: 36px; font-weight: 700; }
   .row .r { color: var(--muted); font-stretch: 125%; font-variant-numeric: tabular-nums; }
   .row .s { font-variant-numeric: tabular-nums; }
-  /* final: three places, tallest in the middle, networking panel alongside */
-  .final { height: 100%; display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(300px, .9fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 18px 40px; }
-  .final h2 { grid-column: 1 / -1; font-size: clamp(36px, 3.4vw, 56px); font-weight: 900; font-stretch: 125%; margin: 0; line-height: 1.02; }
+  /* final: three places, tallest in the middle, networking panel alongside.
+     Every child is placed explicitly. .netcard has a definite row, and the grid
+     spec places row-locked items before auto-positioned ones, so leaving the
+     podium on auto handed column 1 to the netcard and pushed the podium right. */
+  .final { height: 100%; display: grid; grid-template-columns: minmax(0, 2fr) minmax(290px, .85fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 14px 36px; }
+  .final h2 { grid-column: 1 / -1; grid-row: 1; font-size: clamp(28px, 2.7vw, 46px); font-weight: 900; font-stretch: 125%; margin: 0; line-height: 1.05; }
+  .final .podium { grid-column: 1; grid-row: 2; }
+  .final .netcard { grid-column: 2; grid-row: 2 / 4; }
+  .final .runners { grid-column: 1; grid-row: 3; }
   .final.no-net { grid-template-columns: minmax(0, 1fr); }
   /* Podium: a flex row so one, two or three winners all sit correctly, and the
      medal is in the flow rather than absolutely placed, so it can never clip. */
-  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 20px; min-height: 0; }
-  .win { flex: 1 1 0; max-width: 360px; min-width: 0; border-radius: 22px 22px 0 0; padding: 20px 18px 22px;
-         display: flex; flex-direction: column; align-items: center; text-align: center; }
-  .win .medal { width: 54px; height: 54px; margin-bottom: 8px; color: var(--pulse); }
-  .win .avatar { width: clamp(72px, 13vh, 124px); height: auto; margin-bottom: 12px; box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(27,42,78,.16); }
-  .win .place { font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pulse); }
-  .win .name { font-size: clamp(20px, 2vw, 36px); line-height: 1.05; font-weight: 900; font-stretch: 112%; margin: 5px 0 3px; overflow-wrap: anywhere; }
-  .win .pts { font-size: 18px; opacity: .75; font-variant-numeric: tabular-nums; }
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 18px; min-height: 0; }
+  .win { flex: 1 1 0; max-width: 330px; min-width: 0; max-height: 100%; border-radius: 20px 20px 0 0; padding: 16px 16px 18px;
+         display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; }
+  .win .medal { width: clamp(30px, 5.4vh, 50px); height: auto; margin-bottom: 6px; color: var(--pulse); flex: none; }
+  .win .avatar { width: clamp(52px, 10vh, 104px); height: auto; margin-bottom: 10px; flex: none; box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(27,42,78,.16); }
+  .win .place { font-size: clamp(11px, 1.4vh, 15px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pulse); }
+  .win .name { font-size: clamp(17px, 1.8vw, 32px); line-height: 1.05; font-weight: 900; font-stretch: 112%; margin: 4px 0 2px; overflow-wrap: anywhere; }
+  .win .pts { font-size: clamp(13px, 1.6vh, 18px); opacity: .75; font-variant-numeric: tabular-nums; }
 
   /* First place is taller, darker and wider. */
-  .win.p1 { background: var(--navy); color: #fff; flex-grow: 1.3; padding-top: 30px; padding-bottom: 40px; }
-  .win.p1 .medal { width: 66px; height: 66px; color: var(--a2); }
-  .win.p1 .avatar { width: clamp(88px, 16vh, 152px); }
+  .win.p1 { background: var(--navy); color: #fff; flex-grow: 1.28; padding-top: 22px; padding-bottom: 30px; }
+  .win.p1 .medal { width: clamp(38px, 6.6vh, 62px); color: var(--a2); }
+  .win.p1 .avatar { width: clamp(62px, 12.4vh, 126px); }
   .win.p1 .place { color: var(--a2); }
-  .win.p1 .name { font-size: clamp(24px, 2.6vw, 46px); }
+  .win.p1 .name { font-size: clamp(20px, 2.2vw, 38px); }
   .win.p2 { background: #fff; box-shadow: inset 0 0 0 3px var(--navy); }
   .win.p3 { background: #fff; box-shadow: inset 0 0 0 3px var(--line); }
   .win.p3 .medal { color: var(--muted); }
-  .runners { grid-column: 1; display: flex; flex-wrap: wrap; gap: 10px 26px; font-size: 20px; color: var(--muted); align-items: center; }
+  .runners { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: clamp(14px, 1.9vh, 20px); color: var(--muted); align-items: center; }
   .runners span { display: inline-flex; gap: 9px; align-items: center; }
   .runners b { color: var(--navy); font-variant-numeric: tabular-nums; }
 
@@ -167,19 +179,26 @@
   .netfull .qr img { width: min(62vh, 38vw); }
 
   /* winners list (menu panel) */
-  .wins { position: fixed; right: 32px; bottom: 98px; width: min(460px, 92vw); max-height: 66vh; overflow: auto; overscroll-behavior: contain; background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 16px; display: none; flex-direction: column; gap: 10px; z-index: 6; }
+  /* Only the list scrolls, so the title, the buttons and the endpoint stay put
+     however long the list gets. */
+  .wins { position: fixed; right: 32px; bottom: 98px; width: min(460px, 92vw); max-height: min(70vh, 640px); background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 16px; display: none; flex-direction: column; gap: 10px; z-index: 6; box-shadow: 0 18px 48px rgba(19, 32, 63, .28); }
   .wins.open { display: flex; }
   .wins h3 { font-size: 20px; font-weight: 900; margin: 0; }
   .wins .sub { font-size: 14px; color: var(--muted); margin: -4px 0 2px; line-height: 1.4; }
-  .wins ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .wins .scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -4px; padding: 0 4px; }
+  .wins ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+  .wins .gsep { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 12px 0 3px; }
+  .wins .gsep::after { content: ""; flex: 1; height: 2px; background: var(--line); border-radius: 2px; }
+  .wins .gsep:first-child { margin-top: 0; }
   .wins li { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; padding: 5px 8px; border-radius: 10px; background: var(--paper); }
   .wins li .pl { font-size: 13px; font-weight: 800; color: var(--pulse); width: 26px; flex: none; font-variant-numeric: tabular-nums; }
   .wins li .nm2 { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .wins li .sc { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .wins .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .wins li .sc { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+  .wins .acts { display: flex; gap: 8px; flex-wrap: wrap; flex: none; }
   .wins .acts button { flex: 1; min-width: 120px; background: var(--navy); color: #fff; border: 0; border-radius: 10px; padding: 10px 12px; font-size: 15px; font-weight: 700; }
+  .wins .acts button:disabled { opacity: .45; cursor: default; }
   .wins .acts button.warn { background: #fff; color: var(--a0); box-shadow: inset 0 0 0 2px var(--a0); }
-  .wins .ep { font-size: 13px; color: var(--muted); word-break: break-all; }
+  .wins .ep { font-size: 12px; color: var(--muted); word-break: break-all; flex: none; margin: 0; line-height: 1.45; }
 
   /* mentor links editor */
   .ment { position: fixed; right: 32px; bottom: 98px; width: min(620px, 94vw); max-height: 72vh; overflow: auto; overscroll-behavior: contain; background: #fff; border: 2px solid var(--navy); border-radius: 16px; padding: 16px; display: none; flex-direction: column; gap: 10px; z-index: 6; }
@@ -364,6 +383,12 @@ const places = () => (st && st.places) || 3;
 
 // Where the networking QR should point. Host-entered mentor links win over a
 // Linktree in NETWORK_URL, because the mentors page is one scan then one tap.
+// "all 1 mentors' LinkedIn" is the kind of thing that ends up on a projector.
+function mentorPhrase(n) {
+  if (!n) return "the mentors'";
+  return n === 1 ? "our mentor's" : `all ${n} mentors'`;
+}
+
 function netTarget() {
   if (!st) return null;
   if (st.mentors && st.mentors.length) {
@@ -431,30 +456,54 @@ document.getElementById('freshBtn').onclick = async () => {
 };
 
 // The winners list: every podium place ever recorded, newest game first.
+// Rows are grouped by game, otherwise several "1st" in a row reads as a bug.
 let winsKey = '';
 function paintWinners(force) {
   if (!$wins.classList.contains('open')) { winsKey = ''; return; }
-  const w = (st && st.winners) || { count: 0, names: [], winners: [] };
+  const w = (st && st.winners) || { count: 0, shown: 0, names: [], winners: [] };
   const key = w.count + ':' + w.names.join('|');
   if (key === winsKey && !force) return;
   winsKey = key;
-  const rows = w.winners.map(r => `<li><span class="pl">${r.place}${['st', 'nd', 'rd'][r.place - 1] || 'th'}</span>
-    ${avatarSvg(r.avatar, { size: 30 })}<span class="nm2">${esc(r.name)}</span><span class="sc">${(r.score || 0).toLocaleString()}</span></li>`).join('');
+
+  const when = ts => {
+    const d = new Date(ts);
+    if (isNaN(d)) return 'Earlier game';
+    const mins = Math.round((Date.now() - d.getTime()) / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins} min ago`;
+    if (mins < 1440) return `${Math.round(mins / 60)} h ago`;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
+
+  let body = '', lastGame = null, games = 0;
+  for (const r of w.winners) {
+    if (r.game_id !== lastGame) {
+      if (lastGame !== null) body += '</ol>';
+      lastGame = r.game_id;
+      games++;
+      body += `<div class="gsep">Game ${games} &middot; ${esc(when(r.recorded_at))}</div><ol>`;
+    }
+    body += `<li><span class="pl">${r.place}${['st', 'nd', 'rd'][r.place - 1] || 'th'}</span>
+      ${avatarSvg(r.avatar, { size: 30 })}<span class="nm2">${esc(r.name)}</span><span class="sc">${(r.score || 0).toLocaleString()}</span></li>`;
+  }
+  if (lastGame !== null) body += '</ol>';
+
+  const unique = w.names.length;
   $wins.innerHTML = `<div class="phead"><h3>Winners list</h3>
       <button class="pclose" id="winClose" aria-label="Close winners list" title="Close (Esc)">&times;</button></div>
     <p class="sub">The top ${places()} of every finished game, saved automatically. Newest first.</p>
-    ${rows ? `<ol>${rows}</ol>` : '<p class="sub">No games have finished yet. The podium is saved the moment a game ends.</p>'}
-    ${w.count > w.shown ? `<p class="sub">Showing the newest ${w.shown} of ${w.count}. The full list is at /api/winners</p>` : ''}
+    <div class="scroll">${body || '<p class="sub">No games have finished yet. The podium is saved the moment a game ends.</p>'}</div>
+    ${w.count > w.shown ? `<p class="ep">Showing the newest ${w.shown} of ${w.count}.</p>` : ''}
     <div class="acts">
-      <button id="copyWins" ${w.names.length ? '' : 'disabled'}>Copy ${w.names.length} name${w.names.length === 1 ? '' : 's'}</button>
+      <button id="copyWins" ${unique ? '' : 'disabled'}>Copy ${unique} name${unique === 1 ? '' : 's'}</button>
       <button class="warn" id="clearWins" ${w.count ? '' : 'disabled'}>Clear list</button>
     </div>
-    <p class="ep">Other activities can read this list at <b>${esc(location.origin)}/api/winners</b></p>`;
+    <p class="ep">${unique < w.count ? `${w.count} places, ${unique} different ${unique === 1 ? 'person' : 'people'}. Copy gives the names once each.<br>` : ''}Other activities can read this list at <b>${esc(location.origin)}/api/winners</b></p>`;
+
   document.getElementById('winClose').onclick = () => closeOverlays();
   const copy = document.getElementById('copyWins');
   if (copy) copy.onclick = async () => {
-    const text = w.names.join('\n');
-    try { await navigator.clipboard.writeText(text); copy.textContent = 'Copied'; setTimeout(() => paintWinners(true), 1500); }
+    try { await navigator.clipboard.writeText(w.names.join('\n')); copy.textContent = 'Copied'; setTimeout(() => paintWinners(true), 1500); }
     catch (err) { flash('Copy failed. The list is also at /api/winners'); }
   };
   const clear = document.getElementById('clearWins');
@@ -464,6 +513,7 @@ function paintWinners(force) {
     catch (err) { flash(err.message); }
   };
 }
+
 document.getElementById('newBtn').onclick = () => {
   closeOverlays();
   const unfinished = st && st.phase !== 'none' && st.phase !== 'final' && st.phase !== 'lobby';
@@ -692,7 +742,7 @@ function netView() {
   if (!t) { netMode = false; return render(true); }
   $main.innerHTML = `<section class="netfull">
     <div><h1>Go meet<br>the mentors.</h1>
-      <p>Scan it, then tap any ${t.count ? `of the ${t.count} ` : ''}mentor to open their LinkedIn. Send the request before you leave the room.</p>
+      <p>${t.count === 1 ? 'Scan it to open our mentor’s LinkedIn.' : `Scan it, then tap any ${t.count ? `of the ${t.count} ` : ''}mentors to open their LinkedIn.`} Send the request before you leave the room.</p>
       <div class="u">${esc(t.url)}</div></div>
     <div class="qr"><img src="${esc(t.qr)}" alt="QR code for the mentor links"></div>
   </section>`;
@@ -780,7 +830,7 @@ function finalView() {
   const netT = netTarget();
   const net = netT ? `<aside class="netcard fade-up" style="animation-delay:700ms">
       <h3>Keep the night going</h3>
-      <p>Scan to open ${netT.count ? `all ${netT.count} mentors'` : "the mentors'"} LinkedIn.</p>
+      <p>Scan to open ${mentorPhrase(netT.count)} LinkedIn.</p>
       <img src="${esc(netT.qr)}" alt="QR code for the mentor links">
       <div class="u">${esc(netT.url)}</div>
     </aside>` : '';

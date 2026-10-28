@@ -323,9 +323,9 @@ function rankView(title) {
 function networkCta() {
   const url = st.mentorCount ? '/mentors' : (st.network || '');
   if (!url) return '';
-  const sub = st.mentorCount
-    ? `Tap any of the ${st.mentorCount} mentors to open their LinkedIn`
-    : "Every mentor's LinkedIn and today's links";
+  const sub = !st.mentorCount ? "Every mentor's LinkedIn and today's links"
+    : st.mentorCount === 1 ? "Open our mentor's LinkedIn"
+    : `Tap any of the ${st.mentorCount} mentors to open their LinkedIn`;
   const target = st.mentorCount ? '' : ' target="_blank" rel="noopener noreferrer"';
   return `<a class="net" href="${esc(url)}"${target}>Meet the mentors<span>${esc(sub)}</span></a>`;
 }
