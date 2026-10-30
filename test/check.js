@@ -121,7 +121,7 @@ function svgErrors(svg) {
 
 // ---------- 3. all client JavaScript parses ----------
 {
-  for (const f of ['public/avatar.js', 'public/art.js', 'public/common.js']) {
+  for (const f of ['public/avatar.js', 'public/art.js', 'public/common.js', 'public/logos.js']) {
     try { new vm.Script(read(f), { filename: f }); ok(`${f} parses`); }
     catch (e) { fail(`${f}: ${e.message}`); }
   }
