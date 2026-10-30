@@ -55,6 +55,9 @@
   .state b { color: var(--navy); }
   .foot { margin-top: 26px; font-size: 14px; color: var(--muted); line-height: 1.5; }
   .foot a { color: var(--a1); font-weight: 700; }
+  .credit { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); line-height: 1.4; }
+  .credit .beat { flex: none; width: 34px; height: 18px; fill: none; stroke: var(--pulse); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .credit a { color: var(--navy); font-weight: 800; text-decoration: none; border-bottom: 2px solid var(--pulse); }
 </style>
 </head>
 <body>
@@ -70,6 +73,8 @@
   <div id="room"></div>
   <div id="list"><p class="state">Loading the list&hellip;</p></div>
   <p class="foot">Omni Pulse Tech 2026 &middot; <a href="/">Back to Pulse Check</a></p>
+  <p class="credit"><svg class="beat" viewBox="0 0 34 18" aria-hidden="true"><path d="M1 10h9l3-7 4 13 3-9 2 3h11"/></svg>
+    <span>Pulse Check was built by <a href="https://www.linkedin.com/in/kirtirajsinhatodariya/" target="_blank" rel="noopener noreferrer">Kirtirajsinh Atodariya</a></span></p>
 </div>
 
 <script src="/art.js"></script>
