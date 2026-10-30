@@ -68,10 +68,14 @@ and players get a page they can tap through.
 1. On the host screen: **Menu → Mentor links**.
 2. Paste one mentor per line, then **Save links**:
    ```
-   Asha Patel | Cloud Architect at TCS | https://linkedin.com/in/example
+   Asha Patel | Cloud Architect | TCS | https://linkedin.com/in/example
    Ravi Singh | Security Lead | https://linkedin.com/in/example2
-   # lines starting with # are ignored, and the role is optional
+   # Name | Job Title | Company | Link. Title and company are optional,
+   # and a link copied without https:// (linkedin.com/in/...) is fine.
    ```
+   Each company gets a coloured monogram badge (TCS, CDW, BM...) on the mentor
+   cards and in an "In the room today" strip. These stand in for logos: real logo
+   images would have to load over venue Wi-Fi, which the app avoids everywhere.
 3. That's it. The final screen shows a QR to `/mentors`, and so does **N** at any time.
    Every player's phone gets a **Meet the mentors** button on their final screen.
 

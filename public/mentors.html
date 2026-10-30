@@ -28,6 +28,21 @@
   .txt { flex: 1; min-width: 0; }
   .nm { display: block; font-size: 18px; font-weight: 800; line-height: 1.15; }
   .ti { display: block; font-size: 14px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+
+  /* Company badge: a square monogram tile standing in for a logo. Real logos would
+     mean fetching images over venue Wi-Fi, so the tile is drawn from the name. */
+  .co { display: flex; align-items: center; gap: 7px; margin-top: 7px; font-size: 13px; font-weight: 700; color: var(--navy); line-height: 1.2; }
+  .mono { flex: none; min-width: 24px; height: 24px; padding: 0 5px; border-radius: 6px; display: inline-grid; place-items: center; font-size: 11px; font-weight: 900; font-stretch: 112%; letter-spacing: .02em; background: var(--c, var(--navy)); color: var(--on, #fff); }
+  .co .cn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .k0 { --c: var(--navy); } .k1 { --c: var(--a1); } .k2 { --c: var(--a3); }
+  .k3 { --c: var(--a0); } .k4 { --c: var(--a2); --on: var(--navy-deep); } .k5 { --c: var(--muted); }
+
+  .room { margin: 0 0 22px; }
+  .room h2 { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  .room ul { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .room li { display: flex; align-items: center; gap: 7px; background: #fff; border-radius: 999px; padding: 5px 12px 5px 5px; font-size: 13px; font-weight: 700; box-shadow: 0 1px 0 var(--line); }
+  .room .mono { border-radius: 999px; }
+  .room .n { color: var(--muted); font-weight: 600; }
   .go { flex: none; font-size: 14px; font-weight: 800; color: var(--pulse); display: inline-flex; align-items: center; gap: 5px; }
   .go svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -47,6 +62,7 @@
   </div>
   <p class="lede">Tap a name to open their LinkedIn. Send the request while you're still in the room &mdash; they'll remember you.</p>
   <div class="pulse-strip" id="pulse"></div>
+  <div id="room"></div>
   <div id="list"><p class="state">Loading the list&hellip;</p></div>
   <p class="foot">Omni Pulse Tech 2026 &middot; <a href="/">Back to Pulse Check</a></p>
 </div>
@@ -60,6 +76,32 @@ document.getElementById('pulse').innerHTML = ecgSvg();
 const initials = name => name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 6l6 6-6 6"/></svg>';
 
+// Company monogram: "CDW" and "TD Bank" keep their own short caps, otherwise the first
+// letters of up to three words, skipping filler ("Bank of Montreal" -> BM).
+const FILLER = new Set(['of', 'the', 'and', '&', 'inc', 'inc.', 'ltd', 'ltd.', 'llc', 'co', 'co.']);
+function monogram(company) {
+  const words = company.split(/\s+/).filter(w => w && !FILLER.has(w.toLowerCase()));
+  if (/^[A-Z0-9]{2,4}$/.test(words[0] || '')) return words[0];
+  return words.slice(0, 3).map(w => w[0]).join('').toUpperCase() || '?';
+}
+// Colour follows the monogram, so "Tata Consultancy Services" and "... Canada" match.
+const tone = mono => [...mono].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 997, 7) % 6;
+const badge = company => { const m = monogram(company); return `<span class="mono k${tone(m)}" aria-hidden="true">${esc(m)}</span>`; };
+
+// "In the room today": one chip per company, counting its mentors.
+function paintRoom(mentors) {
+  const seen = new Map();
+  mentors.forEach(m => {
+    if (!m.company) return;
+    const key = monogram(m.company);
+    const had = seen.get(key);
+    seen.set(key, { name: had ? had.name : m.company, n: (had ? had.n : 0) + 1 });
+  });
+  if (seen.size < 2) return;
+  document.getElementById('room').innerHTML = `<section class="room"><h2>In the room today &middot; ${seen.size} companies</h2>
+    <ul>${[...seen.values()].map(c => `<li>${badge(c.name)}${esc(c.name)}${c.n > 1 ? `<span class="n">&times;${c.n}</span>` : ''}</li>`).join('')}</ul></section>`;
+}
+
 (async () => {
   const list = document.getElementById('list');
   try {
@@ -68,10 +110,11 @@ const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 
       list.innerHTML = `<p class="state">The mentor links aren't up yet. <b>Check back at the end of the quiz</b> &mdash; the host adds them from the projector screen.</p>`;
       return;
     }
+    paintRoom(mentors);
     list.innerHTML = `<ul>${mentors.map((m, i) => `<li style="animation-delay:${Math.min(i * 45, 500)}ms">
       <a class="m" href="${esc(m.url)}" target="_blank" rel="noopener noreferrer">
         <span class="ini" aria-hidden="true">${esc(initials(m.name))}</span>
-        <span class="txt"><span class="nm">${esc(m.name)}</span>${m.title ? `<span class="ti">${esc(m.title)}</span>` : ''}</span>
+        <span class="txt"><span class="nm">${esc(m.name)}</span>${m.title ? `<span class="ti">${esc(m.title)}</span>` : ''}${m.company ? `<span class="co">${badge(m.company)}<span class="cn">${esc(m.company)}</span></span>` : ''}</span>
         <span class="go">Open${ARROW}</span>
       </a></li>`).join('')}</ul>`;
   } catch (e) {

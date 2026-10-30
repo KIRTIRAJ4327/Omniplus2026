@@ -415,10 +415,10 @@ function paintMentors(note) {
   const n = (st && st.mentors || []).length;
   $ment.innerHTML = `<div class="phead"><h3>Mentor links</h3>
       <button class="pclose" id="mentClose" aria-label="Close mentor links" title="Close (Esc)">&times;</button></div>
-    <p class="sub">One mentor per line: <code>Name | Role at Company | https://linkedin.com/in/…</code><br>
-      The role is optional. Lines starting with <code>#</code> are ignored. Players see these at
+    <p class="sub">One mentor per line: <code>Name | Job Title | Company | linkedin.com/in/…</code><br>
+      Title and company are optional; the company gets a badge on players' phones. Lines starting with <code>#</code> are ignored. Players see these at
       <b>${esc(location.origin)}/mentors</b>, and the networking QR points there once there is at least one.</p>
-    <textarea id="mentText" spellcheck="false" placeholder="Asha Patel | Cloud Architect at TCS | https://linkedin.com/in/example
+    <textarea id="mentText" spellcheck="false" placeholder="Asha Patel | Cloud Architect | TCS | https://linkedin.com/in/example
 Ravi Singh | Security Lead | https://linkedin.com/in/example2"></textarea>
     <div class="acts"><button id="mentSave">Save links</button>
       <span class="count">${n} saved</span></div>

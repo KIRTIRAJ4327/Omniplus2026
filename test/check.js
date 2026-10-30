@@ -164,25 +164,37 @@ function svgErrors(svg) {
   };
 
   let a = parseMentors('Asha Patel | Cloud Architect at TCS | https://linkedin.com/in/asha');
-  eq('full line', a.mentors, [{ name: 'Asha Patel', title: 'Cloud Architect at TCS', url: 'https://linkedin.com/in/asha' }]);
-  eq('full line has no errors', a.errors, []);
+  eq('older three-part line', a.mentors, [{ name: 'Asha Patel', title: 'Cloud Architect at TCS', company: '', url: 'https://linkedin.com/in/asha' }]);
+  eq('older three-part line has no errors', a.errors, []);
+
+  a = parseMentors('Udit Pandya | Software Engineer II | Cisco Systems | https://www.linkedin.com/in/uditpandya/');
+  eq('full line', a.mentors, [{ name: 'Udit Pandya', title: 'Software Engineer II', company: 'Cisco Systems', url: 'https://www.linkedin.com/in/uditpandya/' }]);
 
   a = parseMentors('Ravi | https://linkedin.com/in/ravi');
-  eq('name and link only', a.mentors, [{ name: 'Ravi', title: '', url: 'https://linkedin.com/in/ravi' }]);
+  eq('name and link only', a.mentors, [{ name: 'Ravi', title: '', company: '', url: 'https://linkedin.com/in/ravi' }]);
 
   a = parseMentors('# a note\n\n\n   \nSam | https://example.com/sam');
   eq('blank lines and # comments skipped', a.mentors.length, 1);
 
-  a = parseMentors('Jo | Lead | Dev | https://linkedin.com/in/jo');
-  eq('extra pipes fold into the role', a.mentors[0].title, 'Lead Dev');
+  a = parseMentors('Jo | Lead | Dev | Acme | https://linkedin.com/in/jo');
+  eq('extra pipes fold into the job title', [a.mentors[0].title, a.mentors[0].company], ['Lead Dev', 'Acme']);
+
+  a = parseMentors('Kim |  | Acme | https://linkedin.com/in/kim');
+  eq('company with no job title', [a.mentors[0].title, a.mentors[0].company], ['', 'Acme']);
 
   a = parseMentors('No link here');
   eq('a line with no pipe is rejected', a.mentors, []);
   if (!a.errors.length) fail('mentors: a line with no | produced no error');
 
-  a = parseMentors('Bad | linkedin.com/in/nope');
-  eq('link without a scheme is rejected', a.mentors, []);
-  if (!a.errors.length) fail('mentors: a scheme-less link produced no error');
+  a = parseMentors('Sam | linkedin.com/in/sam\nVee | www.linkedin.com/in/vee');
+  eq('link without a scheme gets https://', a.mentors.map(m => m.url), ['https://linkedin.com/in/sam', 'https://www.linkedin.com/in/vee']);
+
+  a = parseMentors('Bad | nope');
+  eq('something that is not a link is rejected', a.mentors, []);
+  if (!a.errors.length) fail('mentors: a non-link produced no error');
+
+  a = parseMentors('Mail | mailto:a@b.com');
+  eq('other schemes are rejected', a.mentors, []);
 
   a = parseMentors('Evil | javascript:alert(1)');
   eq('javascript: link is rejected', a.mentors, []);
@@ -195,7 +207,8 @@ function svgErrors(svg) {
   eq(`capped at ${MAX_MENTORS}`, a.mentors.length, MAX_MENTORS);
 
   // the editor has to round-trip: stored list -> text -> same list
-  const src = 'Asha | Cloud Architect at TCS | https://linkedin.com/in/asha\nRavi | https://linkedin.com/in/ravi';
+  const src = 'Asha | Cloud Architect at TCS | https://linkedin.com/in/asha\nRavi | https://linkedin.com/in/ravi\n'
+    + 'Udit | Software Engineer II | Cisco Systems | https://linkedin.com/in/udit\nKim |  | Acme | https://linkedin.com/in/kim';
   const once = parseMentors(src).mentors;
   eq('editor text round-trips', parseMentors(mentorsToText(once)).mentors, once);
 
