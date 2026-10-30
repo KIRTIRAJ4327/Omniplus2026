@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12275c">
+<title>Corporate Mafia rules</title>
+<meta name="description" content="How to play Corporate Mafia, the job market edition, at Omni Pulse Tech 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bangers&display=swap" rel="stylesheet">
+<style>
+  /* Corporate Mafia has its own comic-book look, separate from Pulse Check's palette,
+     because it is a different game on the same night. Bangers falls back to Impact
+     if Google Fonts doesn't load on venue Wi-Fi, so the page never depends on it. */
+  :root {
+    --ink: #0b0f1a; --sky: #12275c; --gold: #f6c700; --paper: #ffffff; --slate: #3a4358;
+    --blue: #1f7ae0; --red: #e0302b; --green: #179a4a; --purple: #7a3cc7;
+    --comic: 'Bangers', Impact, 'Arial Black', sans-serif;
+    --body: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; color: #fff; font-family: var(--body);
+    background-color: var(--sky);
+    background-image: radial-gradient(circle, rgba(255,255,255,.08) 2.2px, transparent 2.8px);
+    background-size: 24px 24px;
+  }
+  .page { max-width: 1840px; margin: 0 auto; padding: calc(22px + env(safe-area-inset-top, 0px)) 16px calc(32px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 30px; }
+  p, h1, h2, h3 { margin: 0; }
+  .comic { font-family: var(--comic); font-weight: 400; letter-spacing: .04em; }
+
+  /* ---- header ---- */
+  .top { display: flex; flex-direction: column; gap: 22px; }
+  .kicker { font-weight: 800; font-size: 13px; letter-spacing: .2em; color: var(--gold); }
+  h1 { font-size: clamp(58px, 15vw, 166px); line-height: .92; text-shadow: 6px 6px 0 var(--ink); margin-top: 6px; }
+  .edition { display: inline-block; margin: 12px 0 0 4px; font-size: clamp(24px, 6vw, 46px); color: var(--ink); background: var(--gold); border: 4px solid var(--ink); padding: 4px 18px 2px; transform: rotate(-2deg); box-shadow: 6px 6px 0 var(--ink); }
+  .bubble { position: relative; background: var(--paper); color: var(--ink); border: 4px solid var(--ink); border-radius: 26px; padding: 18px 22px; box-shadow: 8px 8px 0 var(--ink); display: flex; flex-direction: column; gap: 8px; }
+  .bubble::before { content: ''; position: absolute; left: 34px; top: -17px; width: 26px; height: 26px; background: var(--paper); border-left: 4px solid var(--ink); border-top: 4px solid var(--ink); transform: rotate(45deg); }
+  .bubble .big { font-weight: 800; font-size: clamp(21px, 2.2vw, 33px); line-height: 1.2; }
+  .bubble .small { font-weight: 600; font-size: clamp(16px, 1.6vw, 25px); line-height: 1.3; color: var(--slate); }
+
+  .label { font-size: clamp(28px, 2.4vw, 36px); color: var(--gold); margin-bottom: 14px; }
+
+  /* ---- role cards ---- */
+  .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px 26px; }
+  .card { position: relative; background: var(--c); border: 4px solid var(--ink); border-radius: 22px; box-shadow: 8px 8px 0 var(--ink); padding: 22px 20px 20px; display: flex; flex-direction: column; gap: 12px; transform: rotate(var(--tilt, 0deg)); }
+  .card:nth-child(1) { --c: var(--blue); --tilt: -1.2deg; }
+  .card:nth-child(2) { --c: var(--red); --tilt: 1.1deg; }
+  .card:nth-child(3) { --c: var(--green); --tilt: -.8deg; }
+  .card:nth-child(4) { --c: var(--purple); --tilt: 1.3deg; }
+  .side { position: absolute; top: -18px; right: 16px; font-size: 22px; background: var(--gold); color: var(--ink); border: 3px solid var(--ink); padding: 3px 12px 1px; transform: rotate(4deg); box-shadow: 3px 3px 0 var(--ink); }
+  .side.bot { background: var(--ink); color: #fff; box-shadow: 3px 3px 0 var(--gold); transform: rotate(-4deg); }
+  .head { display: flex; align-items: center; gap: 14px; }
+  .icon { flex: none; width: 72px; height: 72px; border-radius: 50%; background: var(--paper); border: 4px solid var(--ink); display: grid; place-items: center; }
+  .icon svg { width: 40px; height: 40px; fill: none; stroke: var(--c); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+  .icon svg .dot { fill: var(--c); stroke: none; }
+  .card h3 { font-size: clamp(38px, 3.4vw, 56px); line-height: .95; text-shadow: 3px 3px 0 var(--ink); }
+  .count { font-family: var(--body); font-weight: 800; font-size: 15px; letter-spacing: .06em; text-transform: uppercase; opacity: .9; margin-top: 4px; text-shadow: none; display: block; }
+  .quote { position: relative; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); border-radius: 14px; padding: 10px 14px; margin-top: 6px; font-style: italic; font-weight: 600; font-size: clamp(17px, 1.4vw, 22px); line-height: 1.25; }
+  .quote::before { content: ''; position: absolute; top: -13px; left: 26px; width: 20px; height: 20px; background: var(--paper); border-left: 3px solid var(--ink); border-top: 3px solid var(--ink); transform: rotate(45deg); }
+  .power { margin-top: auto; background: var(--ink); border-radius: 14px; padding: 12px 14px; font-weight: 500; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.32; }
+  .power b { font-family: var(--comic); font-weight: 400; font-size: 1.25em; letter-spacing: .06em; color: var(--gold); }
+
+  /* ---- round + win ---- */
+  .bottom { display: grid; gap: 30px; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 14px; counter-reset: step; }
+  .step { background: var(--paper); color: var(--ink); border: 4px solid var(--ink); border-radius: 14px; box-shadow: 5px 5px 0 var(--ink); padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .step .t { display: flex; align-items: center; gap: 10px; font-size: clamp(32px, 2.6vw, 42px); line-height: 1; }
+  .step .n { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--gold); border: 3px solid var(--ink); display: grid; place-items: center; font-size: 24px; }
+  .step p { font-weight: 600; font-size: clamp(16px, 1.2vw, 19px); line-height: 1.3; }
+  .wins { display: flex; flex-direction: column; gap: 14px; }
+  .win { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; background: var(--c); border: 4px solid var(--ink); border-radius: 14px; box-shadow: 5px 5px 0 var(--ink); padding: 12px 18px; }
+  .win.h { --c: var(--blue); } .win.b { --c: var(--red); }
+  .win .w { font-size: clamp(32px, 2.6vw, 40px); text-shadow: 3px 3px 0 var(--ink); white-space: nowrap; }
+  .win span:last-child { font-weight: 600; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.25; }
+
+  .rules { display: grid; gap: 10px; }
+  .rules li { font-weight: 600; font-size: clamp(16px, 1.3vw, 19px); line-height: 1.35; padding-left: 4px; }
+  .rules ul { margin: 0; padding-left: 20px; }
+  .rules li::marker { color: var(--gold); }
+
+  .scan { display: none; }
+  .foot { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.5; }
+  .foot a { color: var(--gold); font-weight: 700; }
+
+  /* ---- tablet and up ---- */
+  @media (min-width: 760px) {
+    .page { padding-left: 32px; padding-right: 32px; }
+    .steps { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Wide screens (laptop, projector, TV): the original 1920x1080 poster, scaled to fit
+     the window so it looks the same at any resolution. Sizes here are fixed px, not vw,
+     because the whole canvas is scaled. The script at the bottom turns this on. */
+  .poster body { overflow: hidden; }
+  .poster .page { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; max-width: none; margin: 0; transform-origin: 0 0; }
+  .poster h1 { font-size: 166px; } .poster .edition { font-size: 46px; }
+  .poster .bubble .big { font-size: 33px; } .poster .bubble .small { font-size: 25px; }
+  .poster .label { font-size: 36px; } .poster .card h3 { font-size: 56px; }
+  .poster .quote { font-size: 22px; } .poster .power { font-size: 20px; }
+  .poster .step p { font-size: 19px; } .poster .win .w { font-size: 40px; }
+  .poster .win span:last-child { font-size: 20px; } .poster .rules li { font-size: 19px; }
+  .poster .page { padding: 34px 48px 30px; gap: 30px; }
+  .poster .top { flex-direction: row; justify-content: space-between; align-items: center; gap: 40px; }
+  .poster .kicker { font-size: 18px; }
+  .poster .bubble { width: 600px; flex: none; transform: rotate(1.5deg); }
+  .poster .bubble::before { left: -19px; top: auto; bottom: 46px; border-top: 0; border-bottom: 4px solid var(--ink); }
+  .poster .roles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .poster .bottom { grid-template-columns: auto minmax(0, 1fr) 210px; align-items: end; gap: 40px; }
+  .poster .steps { grid-template-columns: repeat(4, 210px); gap: 0 34px; }
+  .poster .step { position: relative; min-height: 140px; }
+  .poster .step:not(:last-child)::after { content: ''; position: absolute; right: -27px; top: 50%; width: 16px; height: 16px; border-right: 5px solid var(--gold); border-top: 5px solid var(--gold); transform: translateY(-50%) rotate(45deg); }
+  .poster .scan { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--paper); color: var(--ink); border: 4px solid var(--ink); border-radius: 16px; box-shadow: 6px 6px 0 var(--ink); padding: 12px; text-align: center; transform: rotate(-1.5deg); }
+  .poster .scan img { width: 150px; height: 150px; display: block; }
+  .poster .scan p { font-size: 24px; line-height: 1; }
+  .poster .page { gap: 24px; }
+  .poster #roles-h { display: none; }
+  .poster .step .t { font-size: 34px; }
+  .poster .rules { display: flex; align-items: baseline; gap: 24px; }
+  .poster .rules .label { margin: 0; flex: none; font-size: 28px; }
+  .poster .rules ul { display: flex; flex-wrap: wrap; gap: 6px 34px; }
+  .poster .foot { display: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card { animation: pop .45s ease-out backwards; }
+    .card:nth-child(2) { animation-delay: .06s; } .card:nth-child(3) { animation-delay: .12s; } .card:nth-child(4) { animation-delay: .18s; }
+    @keyframes pop { from { opacity: 0; transform: translateY(14px) rotate(var(--tilt, 0deg)); } }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <header class="top">
+    <div>
+      <p class="kicker">PART OF OMNI PULSE TECH 2026 &middot; HUMBER POLYTECHNIC</p>
+      <h1 class="comic">CORPORATE MAFIA</h1>
+      <p class="edition comic">THE JOB MARKET EDITION</p>
+    </div>
+    <div class="bubble">
+      <p class="big">Everyone gets a secret role. The bots are hiding among us.</p>
+      <p class="small">Talk. Accuse. Vote. Find them before they filter you out!</p>
+    </div>
+  </header>
+
+  <section aria-labelledby="roles-h">
+    <h2 class="label comic" id="roles-h">THE ROLES</h2>
+    <div class="roles">
+      <article class="card">
+        <p class="side comic">HUMAN SIDE</p>
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.75h8.5L19 7.25V21.25H6z"/><path d="M14 2.75v4.5h4.5"/><path d="M9 12.5h7M9 15.75h7M9 19h4"/></svg></div>
+          <h3 class="comic">JOB APPLICANTS<span class="count">Most of the room</span></h3>
+        </div>
+        <p class="quote">&ldquo;200 applications. Zero replies.&rdquo;</p>
+        <p class="power"><b>POWER: </b>None at night. Your voice and your vote are the whole game.</p>
+      </article>
+      <article class="card">
+        <p class="side bot comic">BOT SIDE</p>
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6v2.4"/><circle class="dot" cx="12" cy="2" r="1.1"/><rect x="3.6" y="5" width="16.8" height="14.4" rx="3.2"/><circle class="dot" cx="8.7" cy="11.1" r="1.5"/><circle class="dot" cx="15.3" cy="11.1" r="1.5"/><path d="M8.6 15.6h6.8"/></svg></div>
+          <h3 class="comic">ATS BOTS<span class="count">A hidden few</span></h3>
+        </div>
+        <p class="quote">&ldquo;You lacked the right keywords.&rdquo;</p>
+        <p class="power"><b>POWER: </b>Wake together at night and auto-reject one player. Act human all day.</p>
+      </article>
+      <article class="card">
+        <p class="side comic">HUMAN SIDE</p>
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l7.4 3.1v6.1c0 4.4-3.1 8-7.4 9.6-4.3-1.6-7.4-5.2-7.4-9.6V5.7z"/><path d="M8.5 11.9l2.5 2.6 4.6-4.9"/></svg></div>
+          <h3 class="comic">REFERRAL CHAMP<span class="count">Just one</span></h3>
+        </div>
+        <p class="quote">&ldquo;I know someone on the inside.&rdquo;</p>
+        <p class="power"><b>POWER: </b>Refer one player each night. If the bots pick them, the referral saves them.</p>
+      </article>
+      <article class="card">
+        <p class="side comic">HUMAN SIDE</p>
+        <div class="head">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9.4" cy="7.6" r="3.5"/><path d="M3.1 19.6c0-3.6 2.8-6 6.3-6 1.1 0 2.2.2 3.1.7"/><circle cx="16.4" cy="15.3" r="4"/><path d="M19.4 18.4l2.6 2.7"/></svg></div>
+          <h3 class="comic">TALENT SCOUT<span class="count">Just one</span></h3>
+        </div>
+        <p class="quote">&ldquo;I&rsquo;ve seen your LinkedIn. All of it.&rdquo;</p>
+        <p class="power"><b>POWER: </b>Screen one player a night. The host tells you secretly if they&rsquo;re a bot.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="bottom">
+    <div>
+      <h2 class="label comic">HOW A ROUND RUNS</h2>
+      <ol class="steps">
+        <li class="step"><span class="t comic"><span class="n">1</span>NIGHT</span><p>Eyes closed. Bots reject. Champ refers. Scout screens.</p></li>
+        <li class="step"><span class="t comic"><span class="n">2</span>MORNING</span><p>Eyes open. The host reveals who got auto-rejected.</p></li>
+        <li class="step"><span class="t comic"><span class="n">3</span>DEBATE</span><p>Accuse, defend, deflect. Five minutes.</p></li>
+        <li class="step"><span class="t comic"><span class="n">4</span>VOTE</span><p>Majority sends one player out of the process.</p></li>
+      </ol>
+    </div>
+    <div>
+      <h2 class="label comic">WHO WINS?</h2>
+      <div class="wins">
+        <p class="win h"><span class="w comic">HUMANS WIN</span><span>when every ATS bot is voted out.</span></p>
+        <p class="win b"><span class="w comic">BOTS WIN</span><span>the moment they outnumber the humans.</span></p>
+      </div>
+    </div>
+    <div class="scan" aria-hidden="true">
+      <img src="/api/qr?t=mafia" alt="">
+      <p class="comic">RULES ON YOUR PHONE</p>
+    </div>
+  </section>
+
+  <section class="rules" aria-labelledby="rules-h">
+    <h2 class="label comic" id="rules-h">HOUSE RULES</h2>
+    <ul>
+      <li>Keep your role secret. No showing your card.</li>
+      <li>Rejected or voted out? Reveal your role, then stay silent.</li>
+      <li>The host runs the night. Their call is final.</li>
+    </ul>
+  </section>
+
+  <p class="foot">Omni Pulse Tech 2026 &middot; <a href="/">Play Pulse Check</a> &middot; <a href="/mentors">Meet the mentors</a></p>
+</main>
+<script>
+// Poster mode on any landscape screen wide enough to read it, scaled to fit and centred.
+// Phones and narrow windows keep the scrolling layout above.
+(() => {
+  const root = document.documentElement, page = document.querySelector('.page');
+  function fit() {
+    const w = innerWidth, h = innerHeight;
+    const on = w >= 1000 && w / h >= 1.25;
+    root.classList.toggle('poster', on);
+    if (!on) { page.style.transform = ''; return; }
+    const k = Math.min(w / 1920, h / 1080);
+    page.style.transform = `translate(${(w - 1920 * k) / 2}px, ${(h - 1080 * k) / 2}px) scale(${k})`;
+  }
+  addEventListener('resize', fit);
+  fit();
+})();
+</script>
+</body>
+
+</html>

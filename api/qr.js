@@ -3,6 +3,7 @@ import { networkUrl } from '../lib/config.js';
 
 // /api/qr           -> QR for the join page
 // /api/qr?t=mentors  -> QR for this app's own /mentors page (host-edited links)
+// /api/qr?t=mafia    -> QR for the Corporate Mafia rules page
 // /api/qr?t=network  -> QR for NETWORK_URL (a Linktree, if you use one instead)
 export default async function handler(req, res) {
   const want = new URL(req.url, 'http://local').searchParams.get('t');
@@ -20,6 +21,8 @@ export default async function handler(req, res) {
     }
   } else if (want === 'mentors') {
     url = origin + '/mentors';
+  } else if (want === 'mafia') {
+    url = origin + '/mafia';
   } else {
     url = origin + '/';
   }

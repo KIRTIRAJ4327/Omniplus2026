@@ -125,7 +125,7 @@ function svgErrors(svg) {
     try { new vm.Script(read(f), { filename: f }); ok(`${f} parses`); }
     catch (e) { fail(`${f}: ${e.message}`); }
   }
-  for (const f of ['public/index.html', 'public/host.html', 'public/mentors.html']) {
+  for (const f of ['public/index.html', 'public/host.html', 'public/mentors.html', 'public/mafia.html']) {
     const html = read(f);
     const blocks = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
     if (!blocks.length) { fail(`${f}: no inline script found`); continue; }

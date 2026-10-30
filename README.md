@@ -90,6 +90,12 @@ panel simply doesn't appear.
 Players can also reach the list directly at `/mentors`, and `GET /api/mentors`
 returns it as JSON.
 
+## Corporate Mafia rules
+`/mafia` explains the Corporate Mafia activity. On a projector-sized screen it fits on
+one screen, like a poster, with a QR (`/api/qr?t=mafia`) so players can open the same
+page on their phones; on a phone it becomes one scrolling column. It is a static page
+with no database calls.
+
 ## The winners list
 The top 3 of a game is saved the moment the game reaches its final screen. Nothing
 is saved if you abandon a game before then, so press through to the podium. The host
